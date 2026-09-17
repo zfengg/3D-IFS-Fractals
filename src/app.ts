@@ -1,3 +1,5 @@
+import {SurfaceEditor} from './SurfaceEditor';
+import type {SurfaceDefinition} from './surfaces';
 import {BernoulliEditor} from './BernoulliEditor';
 import {isBernoulli} from './bernoulli';
 import {SpongeEditor} from './SpongeEditor';
@@ -7,7 +9,7 @@ import {FractalViewer,type ColorMode} from './FractalViewer';
 import {presets,createPreset,type Preset} from './presets';
 import {IFS,type MapDefinition,type PointSample} from './model';
 
-function $(id:'editor'|'export-dialog'|'sponge-dialog'|'bernoulli-dialog'): HTMLDialogElement;
+function $(id:'editor'|'export-dialog'|'sponge-dialog'|'bernoulli-dialog'|'surface-dialog'): HTMLDialogElement;
 function $(id:string): HTMLInputElement;
 function $(id:string): HTMLElement {const el=document.getElementById(id);if(!el)throw Error(`Missing element ${id}`);return el;}
 interface Candidate {maps:MapDefinition[];info:Preset;custom?:boolean;key?:string}
@@ -16,6 +18,7 @@ let system=createPreset('tetra');
 let customSystem:IFS|null=null;
 let activeSponge:SpongeDefinition|undefined;
 let customSponge:SpongeDefinition|undefined;
+let activeSurface:SurfaceDefinition|undefined,customSurface:SurfaceDefinition|undefined;
 let currentPreset='tetra';
 let maps=system.toJSON(),palette='aurora',seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
@@ -51,17 +54,17 @@ function recolor(){
 function regenerate(candidate:Candidate|null=null){
  if(!viewer)return;
  const burnIn=$('burn-in').valueAsNumber,initialPoint=['initial-x','initial-y','initial-z'].map(id=>$(id).valueAsNumber);seed=$('seed').valueAsNumber;
- if(!Number.isInteger(seed)||!Number.isInteger(burnIn)||burnIn<0||burnIn>10000||!initialPoint.every(Number.isFinite)){const message='Enter a whole-number seed, a burn-in from 0 to 10,000, and three finite initial coordinates.';showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;return;}
+ if(!Number.isInteger(seed)||!Number.isInteger(burnIn)||burnIn<0||burnIn>10000||!initialPoint.every(Number.isFinite)){const message='Enter a whole-number seed, a burn-in from 0 to 10,000, and three finite initial coordinates.';showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;return;}
  worker?.terminate();clearTimeout(timeout);const id=++job;pending=candidate;
  $('status').textContent='Generating points…';showError('');worker=new Worker(new URL('./worker.ts',import.meta.url),{type:'module'});
- const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;$('status').textContent=sample?'Previous result retained':'Generation failed';};
+ const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;$('status').textContent=sample?'Previous result retained':'Generation failed';};
  worker.onerror=e=>fail(messageOf(e)||'Unable to start the point generator.');
  worker.onmessage=({data})=>{
   if(data.id!==job)return;
   if(data.error){fail(data.error);return;}clearTimeout(timeout);worker?.terminate();
-  if(pending){system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
+  if(pending){activeSurface=pending.info.surface?structuredClone(pending.info.surface):undefined;system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSurface=activeSurface?structuredClone(activeSurface):undefined;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
   sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();$('status').textContent=`${data.ids.length.toLocaleString()} points · ${maps.length} ${mapKindLabel()}`;
-  if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();
+  if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();
  };
  timeout=setTimeout(()=>fail('Generation took too long. Try fewer points or simpler expressions.'),15000);
  worker.postMessage({id,maps:candidate?.maps||maps,count:Number($('count').value),seed,burnIn,initialPoint});
@@ -76,7 +79,7 @@ function init(){
   $('status').textContent='3D rendering unavailable';
  }
 }
-$('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
+$('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge,surface:customSurface},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
 $('count').addEventListener('input',()=>{$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>regenerate(pending));
 $('size').addEventListener('input',()=>{$('size-label').textContent=Number($('size').value).toFixed(1);viewer?.setPointSize(Number($('size').value));});
 $('color-mode').addEventListener('change',recolor);
@@ -148,7 +151,9 @@ const spongeEditor=new SpongeEditor((next,name,sponge)=>{
  regenerate({maps:next,info:{name,description:'',maps:next,sponge},custom:true});
 });
 const bernoulliEditor=new BernoulliEditor((next,name)=>{regenerate({maps:next,info:{name,description:'',maps:next},custom:true});});
+const surfaceEditor=new SurfaceEditor((next,name,surface)=>{regenerate({maps:next,info:{name,description:'',maps:next,surface},custom:true});});
 function editCurrent(){
+ if(activeSurface){surfaceEditor.open(activeSurface,system.name);return;}
  if(activeSponge)spongeEditor.open(activeSponge,system.name);
  else if(isBernoulli(maps))bernoulliEditor.open(maps,system.name);
  else editor.open(maps,system.name,false);

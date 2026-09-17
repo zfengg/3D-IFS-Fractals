@@ -197,3 +197,20 @@ test('surface IFSes preserve their continuous graph equations',()=>{
  assert.ok(Math.abs(value('terrain',.5,.5)-.9625)<1e-12);
  assert.deepEqual([[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>Number(value('terrain',x,y).toFixed(10))),[0,.2,.35,.1]);
 });
+
+test('editable summands produce the same branches as the surface presets',async()=>{
+ const {editableSurfaceMaps,surfaceDefinitions}=await import('../src/surfaces');
+ for(const kind of ['weierstrass','terrain','takagi'] as const){
+  const edited=IFS.fromJSON(editableSurfaceMaps(surfaceDefinitions[kind])),original=createPreset(kind);
+  for(let i=0;i<4;i++){
+   const a:Vector3=[0,0,0],b:Vector3=[0,0,0];
+   edited.maps[i].apply(.23,.61,.4,a);original.maps[i].apply(.23,.61,.4,b);
+   a.forEach((v,j)=>assert.ok(Math.abs(v-b[j])<1e-12));
+  }
+ }
+ const custom={phi:'exp(x)+y^2',lambda:.4,base:'x*y'};
+ const map=IFS.fromJSON(editableSurfaceMaps(custom)).maps[3],out:Vector3=[0,0,0];
+ map.apply(.2,.4,.7,out);
+ assert.ok(Math.abs(out[2]-(.4*(.7-.2*.4)+.6*.7+Math.exp(.6)+.7**2))<1e-12);
+ for(const definition of [{...custom,lambda:1},{...custom,phi:'z'},{...custom,phi:'sin('}])assert.throws(()=>editableSurfaceMaps(definition));
+});

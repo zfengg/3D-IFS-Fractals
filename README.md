@@ -26,7 +26,7 @@ Map weights are positive probabilities summing to 1. **Uniform** assigns equal w
 
 **BM sponge with MFD = MME** reproduces Example 7.1 of [Zhou Feng, *On the coincidence of the Hausdorff and box dimensions for some affine-invariant sets*](https://doi.org/10.1017/etds.2025.10208): six equally weighted maps with linear part `diag(1/64, 1/16, 1/8)` and digit vectors `(0,0,0)`, `(0,1,0)`, `(0,2,0)`, `(0,3,0)`, `(0,0,1)`, `(1,0,1)`. Each translation is the digit vector multiplied by that matrix.
 
-The surface examples are continuous graphs over `[0,1]²`, sampled by four equally weighted maps:
+All three surface examples use the Weierstrass-type series `h(x,y) + Σ λⁿ φ(2ⁿx,2ⁿy)`. They are continuous graphs over `[0,1]²`, sampled by four equally weighted maps:
 
 | Surface | Definition and parameters |
 | --- | --- |
@@ -34,7 +34,7 @@ The surface examples are continuous graphs over `[0,1]²`, sampled by four equal
 | Takagi-type | `Σ λⁿ [τ(2ⁿx) + τ(2ⁿy)]`, λ = 0.6 |
 | Interpolation terrain | `h(x,y) + 0.8 Σ 0.45ⁿ τ(2ⁿx)τ(2ⁿy)`, with `h = 0.2x + 0.35y − 0.45xy` |
 
-Here `n ≥ 0` and `τ(t) = 2 dist(t, ℤ)` is the periodic tent function. The terrain interpolates the four corner heights of `h` and height 0.9625 at the center. Matrix/expression definitions can be changed through **Edit IFS**; arbitrary edits need not preserve a continuous graph. The Takagi maps are affine because the tent function is linear on each half-period.
+Here `n ≥ 0` and `τ(t) = 2 dist(t, ℤ)` is the periodic tent function. The terrain interpolates the four corner heights of `h` and height 0.9625 at the center. **Edit IFS** opens a shared surface editor with sine-product, tent-product, tent-sum, and custom summands, editable λ, and base h(x,y); arbitrary edits need not preserve a continuous graph. The Takagi maps are affine because the tent function is linear on each half-period.
 
 ## How it works
 
