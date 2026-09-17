@@ -11,7 +11,7 @@ Built with **TypeScript, Three.js, and Vite**—no backend or API keys required.
 
 - **Load an example:** Sierpiński tetrahedron, Menger, Barański, Bedford–McMullen, Vicsek, Cantor dust, a twisted tetrahedron, and a branching tree.
 - **Edit an IFS:** combine affine matrices and nonlinear expressions; import or export JSON.
-- **Shape a Bernoulli convolution:** drag the three matrix columns in a 3D cube preview; both maps share the linear part with translations `(0,0,0)` and `(1,1,1)`.
+- **Shape a Bernoulli convolution:** drag the three matrix columns in a 3D cube preview; both maps share the linear part with editable translations, initially `(0,0,0)` and `(1,1,1)`.
 - **Design a sponge:** define its grid, select cells layer by layer, and inspect a live 3D preview.
 - **Adjust the plot:** point count, size, colors, rotation, and an optional reference grid.
 - **Download:** tightly cropped PNG, PDF, or JPEG; transparent background by default where supported.

@@ -137,14 +137,20 @@ test('motion budget responds to sustained slow frames without reacting to pauses
  assert.equal(quality.budget,50000);
 });
 
-test('Bernoulli maps share a matrix with fixed translations and complementary probabilities',async()=>{
+test('Bernoulli maps share a matrix with editable translations and complementary probabilities',async()=>{
  const {bernoulliMaps,bernoulliMatrix,isBernoulli}=await import('../src/bernoulli');
  const maps=bernoulliMaps(bernoulliMatrix,.3);
  assert.deepEqual(maps.map(m=>m.b),[[0,0,0],[1,1,1]]);
  assert.deepEqual(maps.map(m=>m.p),[.3,.7]);
  assert.deepEqual(maps[0].a,maps[1].a);assert.notEqual(maps[0].a,maps[1].a);
  assert.ok(isBernoulli(maps));assert.ok(!isBernoulli(presets.tetra.maps));
- assert.ok(!isBernoulli([maps[0],{...maps[1],b:[1,0,1]}]));
+ assert.ok(isBernoulli([maps[0],{...maps[1],b:[1,0,1]}]));
+ const translations=[[-.2,.3,0],[1,2,-3]];
+ const edited=bernoulliMaps(bernoulliMatrix,.4,translations);
+ assert.deepEqual(edited.map(m=>m.b),translations);assert.notEqual(edited[0].b,translations[0]);
+ assert.deepEqual(IFS.fromJSON(edited).toJSON(),edited);assert.ok(isBernoulli(edited));
+ assert.throws(()=>bernoulliMaps(bernoulliMatrix,.5,[[NaN,0,0],[1,1,1]]));
+ assert.throws(()=>bernoulliMaps(bernoulliMatrix,.5,[[0,0],[1,1,1]]));
  assert.throws(()=>bernoulliMaps([1,2]));assert.throws(()=>bernoulliMaps(bernoulliMatrix,0));
  assert.throws(()=>bernoulliMaps(bernoulliMatrix,1));
  const p:Vector3=[1,2,3],out:Vector3=[0,0,0];

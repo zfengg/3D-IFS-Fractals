@@ -8,6 +8,7 @@ import type { AffineDefinition } from './model';
 export class BernoulliEditor {
  private readonly dialog = document.createElement('dialog');
  private readonly inputs: HTMLInputElement[] = [];
+ private readonly translationInputs: HTMLInputElement[][] = [];
  private matrix = [...bernoulliMatrix];
  private preview?: {sync:()=>void;resize:()=>void; stop:()=>void};
  private name = '3D Bernoulli convolutions';
@@ -15,9 +16,9 @@ export class BernoulliEditor {
   this.dialog.id='bernoulli-dialog';
   this.dialog.setAttribute('aria-labelledby','bernoulli-title');
   this.dialog.innerHTML=`<form method="dialog" class="dialog-heading"><h2 id="bernoulli-title">3D Bernoulli convolutions</h2><button class="close" aria-label="Close Bernoulli editor">×</button></form>
-   <p class="bernoulli-formula">f₀(x) = Ax &nbsp; · &nbsp; f₁(x) = Ax + (1, 1, 1)</p>
+   <p class="bernoulli-formula">f₀(x) = Ax + b₀ &nbsp; · &nbsp; f₁(x) = Ax + b₁</p>
    <div class="bernoulli-layout"><div><div class="bernoulli-columns" role="group" aria-label="Select matrix column"><button type="button" data-column="0">A e₁</button><button type="button" data-column="1">A e₂</button><button type="button" data-column="2">A e₃</button></div><div id="bernoulli-preview"></div><p class="sponge-help">Choose a colored endpoint, then drag its arrows or plane handles. Drag elsewhere to orbit; scroll to zoom. The outline is the unit cube; the solid shape is its image under A.</p></div>
-   <div><h3>Shared linear matrix</h3><div id="bernoulli-matrix"></div><p class="sponge-help">Columns are the three edges from the origin. Numeric entries also support precise or keyboard editing.</p><label for="bernoulli-p">Weight of f₀</label><input id="bernoulli-p" type="number" min="0" max="1" step=".01" value=".5"><p id="bernoulli-pair"></p><button id="bernoulli-reset" type="button">Reset matrix</button><p class="sponge-help">Use a contractive matrix for a bounded attractor. Apply to regenerate the fractal.</p></div></div>
+   <div><h3>Shared linear matrix</h3><div id="bernoulli-matrix"></div><p class="sponge-help">Columns are the three edges from the origin. Numeric entries also support precise or keyboard editing.</p><h3>Translations</h3><div id="bernoulli-translations"></div><label for="bernoulli-p">Weight of f₀</label><input id="bernoulli-p" type="number" min="0" max="1" step=".01" value=".5"><p id="bernoulli-pair"></p><button id="bernoulli-reset" type="button">Reset matrix</button><p class="sponge-help">Use a contractive matrix for a bounded attractor. Apply to regenerate the fractal.</p></div></div>
    <p id="bernoulli-error" role="alert"></p><button id="bernoulli-apply" class="primary" type="button">Apply IFS</button>`;
   document.body.append(this.dialog);
   for(let i=0;i<9;i++){
@@ -27,27 +28,40 @@ export class BernoulliEditor {
    input.oninput=()=>{if(input.value!==''&&Number.isFinite(input.valueAsNumber)){this.matrix[i]=input.valueAsNumber;this.preview?.sync();}this.validate();};
    this.el('bernoulli-matrix').append(input);this.inputs.push(input);
   }
+  for(let map=0;map<2;map++){
+   const row=document.createElement('div');row.className='bernoulli-translation';
+   const title=document.createElement('span');title.textContent=map===0?'b₀':'b₁';row.append(title);
+   this.translationInputs.push(['x','y','z'].map(axis=>{
+    const label=document.createElement('label');label.textContent=axis;
+    const input=document.createElement('input');input.type='number';input.step='.01';input.value=String(map);
+    input.setAttribute('aria-label',`Translation ${map} ${axis}`);input.oninput=()=>this.validate();
+    label.append(input);row.append(label);return input;
+   }));
+   this.el('bernoulli-translations').append(row);
+  }
   this.el('bernoulli-reset').onclick=()=>{this.matrix=[...bernoulliMatrix];this.writeInputs();this.preview?.sync();this.validate();};
   this.el<HTMLInputElement>('bernoulli-p').oninput=()=>this.validate();
   this.el('bernoulli-apply').onclick=()=>{
    if(!this.validate())return;
    this.el('bernoulli-error').textContent='Generating points…';
-   this.onApply(bernoulliMaps(this.matrix,this.el<HTMLInputElement>('bernoulli-p').valueAsNumber),this.name);
+   this.onApply(bernoulliMaps(this.matrix,this.el<HTMLInputElement>('bernoulli-p').valueAsNumber,this.readTranslations()),this.name);
   };
   this.dialog.addEventListener('close',()=>this.preview?.stop());
  }
  private el<T extends HTMLElement=HTMLElement>(id:string):T{return this.dialog.querySelector(`#${id}`) as T;}
+ private readTranslations(){return this.translationInputs.map(row=>row.map(input=>input.valueAsNumber));}
  private writeInputs(){this.inputs.forEach((input,i)=>input.value=String(this.matrix[i]));}
  private validate():boolean{
   try{
    if(this.inputs.some(i=>i.value===''||!Number.isFinite(i.valueAsNumber)))throw new Error('Enter nine finite matrix entries.');
-   const p=this.el<HTMLInputElement>('bernoulli-p').valueAsNumber;bernoulliMaps(this.matrix,p);
+   const p=this.el<HTMLInputElement>('bernoulli-p').valueAsNumber;bernoulliMaps(this.matrix,p,this.readTranslations());
    this.el('bernoulli-pair').textContent=`Weight of f₁: ${Number((1-p).toPrecision(8))}`;
    this.el('bernoulli-error').textContent='';this.el<HTMLButtonElement>('bernoulli-apply').disabled=false;return true;
   }catch(error){this.el('bernoulli-error').textContent=(error as Error).message;this.el<HTMLButtonElement>('bernoulli-apply').disabled=true;return false;}
  }
  open(maps:AffineDefinition[],name:string){
   this.matrix=[...maps[0].a];this.name=name;this.writeInputs();
+  this.translationInputs.forEach((row,i)=>row.forEach((input,j)=>input.value=String(maps[i].b[j])));
   this.el<HTMLInputElement>('bernoulli-p').value=String(maps[0].p);this.validate();this.dialog.showModal();
   if(!this.preview)this.preview=this.createPreview();
   this.preview.sync();this.preview.resize();

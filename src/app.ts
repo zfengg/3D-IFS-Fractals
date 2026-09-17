@@ -153,15 +153,6 @@ function editCurrent(){
  else editor.open(maps,system.name,false);
 }
 $('edit').onclick=editCurrent;
-$('edit-example').onclick=()=>{
- const key=$('preset').value;
- if(key===currentPreset){editCurrent();return;}
- const example=presets[key];
- if(!example)return;
- if(example.sponge)spongeEditor.open(example.sponge,example.name);
- else if(isBernoulli(example.maps))bernoulliEditor.open(example.maps,example.name);
- else editor.open(example.maps,example.name,false);
-};
 $('create-new').onclick=()=>{
  const kind=$('new-system-kind').value;
  if(kind==='general')editor.openNew();else spongeEditor.openNew(kind as SpongeKind);
