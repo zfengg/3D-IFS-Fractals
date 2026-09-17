@@ -10,4 +10,8 @@ export const palettes:Record<string,string[]>={
  inferno:['#000004','#57106e','#bc3754','#f98e09','#fcffa4'],
  magma:['#000004','#51127c','#b73779','#fc8961','#fcfdbf'],
  cividis:['#00224e','#434e6c','#7d7c78','#bcae6c','#fee838'],
+ turbo:['#30123b','#28bceb','#a4fc3c','#fb7e21','#7a0403'],
+ coolwarm:['#3b4cc0','#8db0fe','#dddcdc','#f4987a','#b40426'],
+ spectral:['#9e0142','#f98e52','#ffffbf','#86cfa5','#5e4fa2'],
+ twilight:['#e2d9e2','#6276ba','#2f1436','#b25652','#e2d9e2'],
 };
