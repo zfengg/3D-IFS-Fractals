@@ -173,3 +173,27 @@ test('Feng ETDS example reproduces the six digits and inverse expansion of Examp
  for(const map of system.maps)assert.deepEqual((map as AffineMap).matrix,[1/64,0,0,0,1/16,0,0,0,1/8]);
  assert.deepEqual(system.maps.map(m=>(m as AffineMap).translation.map((v,i)=>v*[64,16,8][i])),[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,0,1],[1,0,1]]);
 });
+
+test('surface IFSes preserve their continuous graph equations',()=>{
+ const tent=(x:number)=>2*Math.abs(x-Math.round(x));
+ const h=(x:number,y:number)=>.2*x+.35*y-.45*x*y;
+ function value(kind:string,x:number,y:number){
+  const lambda=kind==='weierstrass'?.65:kind==='takagi'?.6:.45;
+  let sum=kind==='terrain'?h(x,y):0,weight=1;
+  for(let n=0;n<48;n++){
+   sum+=weight*(kind==='weierstrass'?Math.sin(2*Math.PI*x)*Math.sin(2*Math.PI*y):kind==='takagi'?tent(x)+tent(y):.8*tent(x)*tent(y));
+   x=(2*x)%1;y=(2*y)%1;weight*=lambda;
+  }
+  return sum;
+ }
+ for(const key of ['weierstrass','terrain','takagi']){
+  const system=createPreset(key);assert.equal(system.numMaps,4);
+  for(const [x,y] of [[.13,.27],[.7,.41],[0,0],[1,1],[.5,.5]])for(const map of system.maps){
+   const out:Vector3=[0,0,0];map.apply(x,y,value(key,x,y),out);
+   assert.ok(Math.abs(out[2]-value(key,out[0],out[1]))<1e-8,key);
+   assert.equal(map.weight,.25);
+  }
+ }
+ assert.ok(Math.abs(value('terrain',.5,.5)-.9625)<1e-12);
+ assert.deepEqual([[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>Number(value('terrain',x,y).toFixed(10))),[0,.2,.35,.1]);
+});

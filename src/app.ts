@@ -27,6 +27,7 @@ $('preset').value=currentPreset;
 function showError(message:string){$('error').textContent=message;$('error').hidden=!message;}
 function mapKindLabel(){return `${maps.every(map=>'a' in map)?'affine ':''}${maps.length===1?'map':'maps'}`;}
 function updateInfo(preset:Preset){
+ $('preset-note').textContent=preset.note??'';$('preset-note').hidden=!preset.note;
  $('fractal-title').textContent=preset.name; $('current-ifs-name').textContent=preset.name;
  const nonlinear=maps.filter(m=>'x' in m).length;
  $('map-kind-label').textContent=mapKindLabel();
