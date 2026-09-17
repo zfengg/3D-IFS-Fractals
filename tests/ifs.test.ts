@@ -214,3 +214,32 @@ test('editable summands produce the same branches as the surface presets',async(
  assert.ok(Math.abs(out[2]-(.4*(.7-.2*.4)+.6*.7+Math.exp(.6)+.7**2))<1e-12);
  for(const definition of [{...custom,lambda:1},{...custom,phi:'z'},{...custom,phi:'sin('}])assert.throws(()=>editableSurfaceMaps(definition));
 });
+
+test('piecewise expressions use comparison precedence, lazy branches and nested conditionals',()=>{
+ const evaluate=(s:string,x=0,y=0)=>compileExpression(s)(x,y,0);
+ assert.equal(evaluate('x < 0.35 ? x/0.35 : (1-x)/0.65',.35),1);
+ assert.equal(evaluate('x < 0 ? -1 : x <= 1 ? x : 1',.4),.4);
+ assert.equal(evaluate('x < 0 ? -1 : x <= 1 ? x : 1',2),1);
+ assert.equal(evaluate('x === 0 ? 0 : 1/x'),0);
+ assert.equal(evaluate('x >= 0 ? sqrt(x) : sqrt(-x)',-4),2);
+ assert.equal(evaluate('1 + 2 < 4 ? 7 : 9'),7);
+ assert.equal(evaluate('(x > 0 ? 2 : 3) + (y !== 0 ? 4 : 5)',1,1),6);
+ assert.equal(evaluate('max(x < 0 ? -x : x, 2)',-3),3);
+ for(const s of ['x ? 1','x < ? 1 : 0','x ? : 0','x ? 1 :','x=1','x ? alert(1) : 0'])assert.throws(()=>compileExpression(s));
+});
+
+test('piecewise-linear gallery surface has matching edges and preserves its graph',()=>{
+ const preset=presets.piecewise,definition=preset.surface!;
+ const phi=compileExpression(definition.phi);
+ assert.equal(phi(.35,.6,0),2);
+ for(const t of [0,.2,.35,.6,1]){
+  assert.ok(Math.abs(phi(0,t,0)-phi(1,t,0))<1e-12);
+  assert.ok(Math.abs(phi(t,0,0)-phi(t,1,0))<1e-12);
+ }
+ const graph=(x:number,y:number)=>{let sum=0,weight=1;for(let n=0;n<48;n++){sum+=weight*phi(x%1,y%1,0);x*=2;y*=2;weight*=definition.lambda;}return sum;};
+ const ifs=createPreset('piecewise');
+ for(const map of ifs.maps)for(const [x,y] of [[.13,.27],[.7,.2],[.35,.6]]){
+  const out:Vector3=[0,0,0];map.apply(x,y,graph(x,y),out);
+  assert.ok(Math.abs(out[2]-graph(out[0],out[1]))<1e-9);
+ }
+});

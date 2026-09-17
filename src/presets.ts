@@ -1,4 +1,4 @@
-import {surfaceMaps,surfaceDefinitions,type SurfaceDefinition} from './surfaces';
+import {editableSurfaceMaps,surfaceMaps,surfaceDefinitions,type SurfaceDefinition} from './surfaces';
 import {bernoulliMaps,bernoulliMatrix} from './bernoulli';
 import {spongeMaps,mengerExample,baranskiExample,bedfordExample,type SpongeDefinition} from './sponges';
 import { IFS, type MapDefinition } from './model';
@@ -48,6 +48,7 @@ export const presets: Record<string,Preset>={
  weierstrass:{name:'Weierstrass surface',description:'A continuous graph of a two-variable trigonometric series.',note:'A Weierstrass-type graph with a sine-product summand and repeating waves at finer scales. Four nonlinear maps; vertical factor λ = 0.65. Larger λ retains more fine-scale detail (keep 0 < λ < 1). Edit IFS to change the equations.',maps:surfaceMaps('weierstrass'),surface:surfaceDefinitions.weierstrass},
  terrain:{name:'Fractal interpolation terrain',description:'A bilinear base with recursively repeated tent-shaped bumps.',note:'A Weierstrass-type graph with a tent-product summand and bilinear base, interpolating corner heights 0, 0.2, 0.35, 0.1 at (0,0), (1,0), (0,1), (1,1), and center height 0.9625. Four nonlinear maps; vertical factor 0.45 and bump amplitude 0.8. Heights refer to the original coordinates, before fitting the view.',maps:surfaceMaps('terrain'),surface:surfaceDefinitions.terrain},
  takagi:{name:'Takagi-type surface',description:'A continuous graph made from dyadic tent functions.',note:'A Weierstrass-type graph with a tent-sum summand, producing angular ridges. Four affine maps; vertical factor λ = 0.6. Equal weights sample the horizontal square uniformly.',maps:surfaceMaps('takagi'),surface:surfaceDefinitions.takagi},
+ piecewise:{name:'Piecewise-linear Weierstrass surface',description:'Asymmetric tent functions written with JavaScript-style conditionals.',note:'A Weierstrass-type graph built from asymmetric tents with peaks at x = 0.35 and y = 0.6. The summand is piecewise linear and continuous across the edges of its periodic extension. Four piecewise-affine maps, each with weight 1/4; vertical factor λ = 0.6. Use condition ? value1 : value2 to define the pieces.',maps:editableSurfaceMaps(surfaceDefinitions.piecewise),surface:surfaceDefinitions.piecewise},
  nonlinear:{name:'Sine branches',description:'Three nonlinear maps bend and branch space with sine and cosine. Open the editor to change their equations.',maps:[{x:'.55*x + .25*sin(y) - .7',y:'.55*y + .2*cos(z)',z:'.55*z + .2*sin(x)',p:1/3},{x:'.55*x + .25*sin(z) + .7',y:'.55*y + .2*sin(x)',z:'.55*z + .2*cos(y)',p:1/3},{x:'.5*x + .2*sin(y)',y:'.5*y + .8',z:'.5*z + .3*cos(x)',p:1/3}]}
 };
 

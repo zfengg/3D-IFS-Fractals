@@ -22,9 +22,10 @@ export function surfaceMaps(kind: 'weierstrass' | 'terrain' | 'takagi'): MapDefi
 }
 
 export interface SurfaceDefinition {phi:string;lambda:number;base:string}
-export const surfaceDefinitions:Record<'weierstrass'|'terrain'|'takagi',SurfaceDefinition>={
+export const surfaceDefinitions:Record<'weierstrass'|'terrain'|'takagi'|'piecewise',SurfaceDefinition>={
  weierstrass:{phi:'sin(2*pi*x)*sin(2*pi*y)',lambda:.65,base:'0'},
  terrain:{phi:'0.8*(1-abs(2*x-1))*(1-abs(2*y-1))',lambda:.45,base:'0.2*x+0.35*y-0.45*x*y'},
+ piecewise:{phi:'(x < 0.35 ? x/0.35 : (1-x)/0.65) + (y < 0.6 ? y/0.6 : (1-y)/0.4)',lambda:.6,base:'0'},
  takagi:{phi:'(1-abs(2*x-1))+(1-abs(2*y-1))',lambda:.6,base:'0'},
 };
 

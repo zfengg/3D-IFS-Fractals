@@ -14,10 +14,12 @@ export class SurfaceEditor{
    ? `Fᵢⱼ(x, y, z) = (u, v, ${lambda}z + φ(u, v))`
    : `Fᵢⱼ(x, y, z) = (u, v, ${lambda}(z − h(x, y)) + h(u, v) + φ(u, v))`;
   const kind=Object.entries(surfaceDefinitions).find(([,value])=>value.phi===phi)?.[0];
+  if(kind==='piecewise')this.dialog.querySelector<HTMLDetailsElement>('.piecewise-help')!.open=true;
   this.el('surface-summand-description').textContent=kind==='weierstrass'
    ? 'Sine product: a smooth wave with positive and negative lobes. Repeated copies add oscillations at successively finer scales.'
    : kind==='terrain' ? 'Tent product: a central peak that vanishes on every edge of the unit square. Repeated copies create a ridged terrain.'
    : kind==='takagi' ? 'Tent sum: the sum of two one-dimensional tent functions. Each quadrant is planar, producing a surface with creases at finer scales.'
+   : kind==='piecewise' ? 'Piecewise-linear tents: unequal slopes put the peaks at x = 0.35 and y = 0.6. The ? branch is used when the condition is true; the : branch otherwise.'
    : 'Custom summand: the entered function sets the vertical detail added at each scale.';
  }
  private updatePreview(){
@@ -31,7 +33,7 @@ export class SurfaceEditor{
   <p id="surface-description"></p>
   <label for="surface-name">Name</label><input id="surface-name" class="name-input" maxlength="80">
   <p>f(x,y) = h(x,y) + Σ λⁿ φ(2ⁿx, 2ⁿy), n ≥ 0</p>
-  <div class="summand-layout"><div><label for="surface-function">Summand template</label><select id="surface-function"><option value="custom">Custom</option><option value="weierstrass">Sine product</option><option value="terrain">Tent product</option><option value="takagi">Tent sum</option></select>
+  <div class="summand-layout"><div><label for="surface-function">Summand template</label><select id="surface-function"><option value="custom">Custom</option><option value="weierstrass">Sine product</option><option value="terrain">Tent product</option><option value="takagi">Tent sum</option><option value="piecewise">Piecewise-linear tents</option></select>
   <label for="surface-phi">Summand φ(x,y)</label><textarea id="surface-phi" spellcheck="false"></textarea>
   </div><div class="summand-preview-panel"><h3>Summand preview</h3><div id="summand-preview"></div><p id="summand-preview-status" role="status"></p></div></div>
   <label for="surface-lambda">Vertical factor λ</label><input id="surface-lambda" class="name-input" type="number" min="0" max="1" step=".01">
@@ -42,6 +44,7 @@ export class SurfaceEditor{
   <p>Each map has weight 1/4. The factor λ scales the previous vertical detail, φ adds the summand at the new position, and h sets the base surface.</p>
   <p id="surface-summand-description"></p></section>
   <p class="sponge-help">Use x, y, pi, sin, cos, abs, and arithmetic; write multiplication as *. The summand is repeated periodically from the unit square. Matching values on opposite edges preserve continuity. All four maps update together.</p>
+  <details class="piecewise-help"><summary>Piecewise functions</summary><p>Use JavaScript-style <code>condition ? valueIfTrue : valueIfFalse</code>. For example, this asymmetric tent peaks at x = 0.35:</p><pre><code>x &lt; 0.35 ? x/0.35 : (1-x)/0.65</code></pre><p>Comparisons: <code>&lt; &lt;= &gt; &gt;= === !==</code>. Put each conditional in parentheses when adding or multiplying pieces. You can nest conditionals for more than two pieces. This editor accepts mathematical expressions, not JavaScript statements, functions, or <code>Math.</code> prefixes.</p></details>
   <p id="surface-error" role="alert"></p><button id="surface-apply" class="primary">Apply IFS</button>`;
   document.body.append(this.dialog);
   this.el<HTMLSelectElement>('surface-function').onchange=()=>{
