@@ -1,5 +1,5 @@
 import {SurfaceEditor} from './SurfaceEditor';
-import type {SurfaceDefinition} from './surfaces';
+import {surfaceDefinitions,type SurfaceDefinition} from './surfaces';
 import {BernoulliEditor} from './BernoulliEditor';
 import {isBernoulli} from './bernoulli';
 import {SpongeEditor} from './SpongeEditor';
@@ -162,7 +162,7 @@ function editCurrent(){
 $('edit').onclick=editCurrent;
 $('create-new').onclick=()=>{
  const kind=$('new-system-kind').value;
- if(kind==='general')editor.openNew();else spongeEditor.openNew(kind as SpongeKind);
+ if(kind==='general')editor.openNew();else if(kind==='surface')surfaceEditor.open(surfaceDefinitions.weierstrass,'My Weierstrauss-type IFS','',true);else spongeEditor.openNew(kind as SpongeKind);
 };
 function setWorkflow(create:boolean){
  $('gallery-controls').hidden=create;$('new-system-controls').hidden=!create;
