@@ -33,7 +33,7 @@
         <input id="count" type="range" min="10000" max="5000000" step="10000" value="250000">
         <div class="range-ends"><span>10k</span><span>5 million</span></div>
       <div class="sampling-controls"><details class="sampling"><summary>Sampling settings</summary><label for="seed">Random seed</label><input id="seed" type="number" step="1" value="42"><label for="burn-in">Burn-in iterations</label><input id="burn-in" type="number" min="0" max="10000" step="1" value="100"><label>Initial point</label><div class="initial-point"><input id="initial-x" aria-label="Initial x" type="number" step="any" value="0"><input id="initial-y" aria-label="Initial y" type="number" step="any" value="0"><input id="initial-z" aria-label="Initial z" type="number" step="any" value="0"></div></details>
-      <button id="regenerate" class="secondary-button" type="button">Regenerate</button></div>
+      <button id="regenerate" class="secondary-button" type="button"><svg class="regenerate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 0 1 15-4l3 3M21 3v6h-6M21 14a9 9 0 0 1-15 4l-3-3M3 21v-6h6"/></svg><span>Regenerate</span></button></div>
       <section>
         <label for="size">Point size <output id="size-label">1.4</output></label>
         <input id="size" type="range" min="0.5" max="4" step="0.1" value="1.4">
