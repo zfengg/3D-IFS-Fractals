@@ -165,3 +165,11 @@ test('the five-million-point limit is supported',()=>{
  assert.equal(sample.ids.length,5_000_000);
  assert.ok(sample.positions.every(Number.isFinite));
 });
+
+test('Feng ETDS example reproduces the six digits and inverse expansion of Example 7.1',()=>{
+ const system=createPreset('fengETDS');
+ assert.equal(system.numMaps,6);
+ assert.deepEqual(system.weights,Array(6).fill(1/6));
+ for(const map of system.maps)assert.deepEqual((map as AffineMap).matrix,[1/64,0,0,0,1/16,0,0,0,1/8]);
+ assert.deepEqual(system.maps.map(m=>(m as AffineMap).translation.map((v,i)=>v*[64,16,8][i])),[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,0,1],[1,0,1]]);
+});

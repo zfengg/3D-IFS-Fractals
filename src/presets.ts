@@ -4,6 +4,10 @@ import { IFS, type MapDefinition } from './model';
 export { IFS };
 export interface Preset {name:string; description:string; maps:MapDefinition[]; defaultPoints?:number; sponge?:SpongeDefinition}
 export const diagonal = (s: number, b: number[], p = 1) => ({ a: [s,0,0,0,s,0,0,0,s], b, p });
+// Zhou Feng, ETDS 46 (2026), Example 7.1: f_d(x) = Λ⁻¹(x+d).
+// https://arxiv.org/html/2405.03213#S7
+const fengETDS = [[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,0,1],[1,0,1]]
+ .map(d=>({a:[1/64,0,0,0,1/16,0,0,0,1/8],b:[d[0]/64,d[1]/16,d[2]/8],p:1/6}));
 const tetra = [[0,1.224744871,0],[-1,-0.40824829,-0.577350269],[1,-0.40824829,-0.577350269],[0,-0.40824829,1.154700538]].map(v=>diagonal(.5,v.map(x=>x*.5),1/4));
 const vicsek=[[0,0,0],[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].map(v=>diagonal(1/3,v.map(x=>x*2/3),1/7));
 const fern=[{a:[.12,0,0,0,.22,0,0,0,.12],b:[0,0,0],p:.01},{a:[.83,.035,0,-.035,.85,0,0,0,.8],b:[0,.28,0],p:.76}];
@@ -32,6 +36,7 @@ export const presets: Record<string,Preset>={
  bernoulli:{name:'3D Bernoulli convolutions',description:'Two maps with a shared linear matrix and translations (0,0,0) and (1,1,1).',maps:bernoulliMaps(bernoulliMatrix)},
  menger:{name:'Menger sponge',defaultPoints:750_000,description:'Twenty smaller cubes remain at every level, opening a lattice of tunnels through the original cube.',maps:spongeMaps(mengerExample),sponge:mengerExample},
  baranski:{name:'Barański sponge',description:'A nonuniform 3 × 3 × 3 grid with 20 retained rectangular cells.',maps:spongeMaps(baranskiExample),sponge:baranskiExample},
+ fengETDS:{name:"Feng's ETDS example",description:'Example 7.1: six maps on a 64 × 16 × 8 grid, with uniform weights.',maps:fengETDS},
  bedfordMcMullen:{name:'Bedford–McMullen sponge',description:'A 2 × 3 × 4 grid with 16 retained cells and contraction ratios 1/2, 1/3, 1/4.',maps:spongeMaps(bedfordExample),sponge:bedfordExample},
  octahedron:{name:'Sierpiński octahedron',description:'Six half-scale copies arranged at the vertices of an octahedron.',maps:octahedron},
  cantorDust:{name:'Cantor dust',description:'Eight corner copies at one-third scale form a sparse cubic dust.',maps:dust},
