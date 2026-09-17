@@ -19,6 +19,7 @@ export class FractalViewer {
   private lastMovement = -Infinity;
   private needsRender = true;
   private pointCount = 0;
+  private reportedCount = -1;
   private cloud?: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private readonly uniforms = {
     pointSize: { value: 1.4 },
@@ -28,7 +29,7 @@ export class FractalViewer {
     paletteSize: { value: 3 },
   };
 
-  constructor(private readonly container: HTMLElement, onContextLost: () => void) {
+  constructor(private readonly container: HTMLElement, onContextLost: () => void, private readonly onRenderedCount: (count:number,mapCount:number)=>void = ()=>{}) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     const canvas = this.renderer.domElement;
@@ -68,7 +69,11 @@ export class FractalViewer {
         const count=moving?Math.min(this.pointCount,budget):this.pointCount;
         if(this.cloud.geometry.drawRange.count!==count){this.cloud.geometry.setDrawRange(0,count);this.needsRender=true;}
       }
-      if(this.needsRender){this.renderer.render(this.scene,this.camera);this.needsRender=false;}
+      if(this.needsRender){
+        this.renderer.render(this.scene,this.camera);this.needsRender=false;
+        const count=this.cloud?.geometry.drawRange.count??0;
+        if(count!==this.reportedCount){this.reportedCount=count;this.onRenderedCount(count,this.uniforms.mapCount.value);}
+      }
     });
     canvas.addEventListener('webglcontextlost', event => {
       event.preventDefault();
@@ -115,6 +120,7 @@ export class FractalViewer {
       this.cloud.material.dispose();
     }
     this.pointCount=sample.ids.length;
+    this.reportedCount=-1;
     this.needsRender=true;
     this.uniforms.mapCount.value = mapCount;
     const geometry = new THREE.BufferGeometry();

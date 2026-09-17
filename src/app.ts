@@ -25,6 +25,12 @@ let currentPreset='tetra';
 let maps=system.toJSON(),palette='aurora',seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
 let viewer:FractalViewer|undefined;
+let renderedCount=0,renderedMaps=0,generating=false;
+function updatePointStatus(){
+ $('status').textContent=renderedCount
+  ? `${renderedCount.toLocaleString()} points · ${renderedMaps} ${renderedMaps===1?'map':'maps'}${generating?' · Generating…':''}`
+  : generating?'Generating points…':'No points plotted';
+}
 const swatches=document.querySelector<HTMLElement>('.swatches')!;
 for(const [key,stops] of Object.entries(palettes)){
  const name=key[0].toUpperCase()+key.slice(1),button=document.createElement('button');
@@ -65,8 +71,8 @@ function regenerate(candidate:Candidate|null=null){
  const burnIn=$('burn-in').valueAsNumber,initialPoint=['initial-x','initial-y','initial-z'].map(id=>$(id).valueAsNumber);seed=$('seed').valueAsNumber;
  if(!Number.isInteger(seed)||!Number.isInteger(burnIn)||burnIn<0||burnIn>10000||!initialPoint.every(Number.isFinite)){const message='Enter a whole-number seed, a burn-in from 0 to 10,000, and three finite initial coordinates.';showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;return;}
  worker?.terminate();clearTimeout(timeout);const id=++job;pending=candidate;
- $('status').textContent='Generating points…';showError('');worker=new Worker(new URL('./worker.ts',import.meta.url),{type:'module'});
- const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;$('status').textContent=sample?'Previous result retained':'Generation failed';};
+ generating=true;updatePointStatus();showError('');worker=new Worker(new URL('./worker.ts',import.meta.url),{type:'module'});
+ const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;generating=false;if(sample)updatePointStatus();else $('status').textContent='Generation failed';};
  worker.onerror=e=>fail(messageOf(e)||'Unable to start the point generator.');
  worker.onmessage=({data})=>{
   if(data.id!==job)return;
@@ -76,7 +82,7 @@ function regenerate(candidate:Candidate|null=null){
    $('rotate').checked=viewer!.autoRotate;
   }
   if(pending){activeSurface=pending.info.surface?structuredClone(pending.info.surface):undefined;system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSurface=activeSurface?structuredClone(activeSurface):undefined;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
-  sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();$('status').textContent=`${data.ids.length.toLocaleString()} points · ${maps.length} ${maps.length===1?'map':'maps'}`;
+  generating=false;sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();
   if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();
  };
  timeout=setTimeout(()=>fail('Generation took too long. Try fewer points or simpler expressions.'),15000);
@@ -84,7 +90,7 @@ function regenerate(candidate:Candidate|null=null){
 }
 function init(){
  try {
-  viewer=new FractalViewer($('canvas-container'),()=>showError('The graphics context was lost. Reload this page to restore the view.'));
+  viewer=new FractalViewer($('canvas-container'),()=>showError('The graphics context was lost. Reload this page to restore the view.'),(count,mapCount)=>{renderedCount=count;renderedMaps=mapCount;updatePointStatus();});
   $('rotate').checked=viewer.autoRotate;
   updateInfo(presets.tetra);regenerate();
  } catch(error) {
