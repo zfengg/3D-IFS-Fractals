@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exploring 3D IFS fractals</title>
+  <meta name="description" content="Explore three-dimensional iterated function systems. Rotate fractals, tune their appearance, and edit affine transformations live.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./"><span class="mark" aria-hidden="true">△</span><span>Exploring 3D IFS fractals</span></a><div class="header-links"><a class="plot-help" href="https://en.wikipedia.org/wiki/Chaos_game" target="_blank" rel="noopener noreferrer" aria-label="About the chaos game plotting method (opens in a new tab)" title="Chaos game: repeatedly apply a randomly chosen map, using its weight as the selection probability, and plot the resulting points.">?</a><a class="github-link" href="https://github.com/zfengg/3d-ifs-fractals" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository (opens in a new tab)" title="View source on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.73.39-1.22.71-1.5-2.5-.28-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.01-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.09 1.15a10.8 10.8 0 0 1 5.62 0c2.15-1.46 3.09-1.15 3.09-1.15.61 1.55.23 2.69.11 2.98.72.78 1.16 1.78 1.16 3.01 0 4.32-2.63 5.28-5.14 5.56.4.35.76 1.03.76 2.08v3.1c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/></svg></a></div></header>
+  <main>
+    <aside id="ifs-panel" class="panel system-panel" aria-label="IFS settings and creation">
+      <div class="panel-heading"><h1>IFS</h1><button id="toggle-ifs" class="sidebar-toggle" type="button" aria-label="Hide IFS" aria-expanded="true" aria-controls="ifs-panel">Hide</button></div>
+      <div class="ifs-mode-switch" role="group" aria-label="IFS workflow"><button id="mode-example" type="button" class="selected" aria-pressed="true">Load example</button><button id="mode-create" type="button" aria-pressed="false">Create new</button></div>
+      <div id="gallery-controls"><select id="preset" aria-label="Example"></select><button id="edit-example" class="editor-entry" type="button">Edit selected example <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></button></div>
+      <div id="new-system-controls" hidden><select id="new-system-kind" aria-label="System type"><option value="general" selected>General IFS</option><option value="menger">Menger sponge</option><option value="bedfordMcMullen">Bedford–McMullen sponge</option><option value="baranski">Barański sponge</option></select><button id="create-new" class="editor-entry" type="button">Create new <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+      <section class="current-system-section"><div class="current-system-heading"><h2 id="current-ifs-name">Sierpiński tetrahedron</h2><button id="edit" class="secondary-button" type="button">Edit</button></div><div class="system-summary"><strong id="map-count">4</strong><span id="map-kind-label">affine maps</span><span id="system-type"></span></div><div id="map-list" class="current-map-list"></div></section>
+    </aside>
+    <section class="viewport" aria-label="Interactive 3D fractal">
+      <div id="canvas-container"></div>
+      <button id="show-ifs" class="sidebar-toggle panel-restore restore-left" type="button" aria-expanded="false" aria-controls="ifs-panel" hidden>IFS</button>
+      <button id="show-appearance" class="sidebar-toggle panel-restore restore-right" type="button" aria-expanded="false" aria-controls="appearance-panel" hidden>Plot</button>
+      <div class="view-heading"><h2 id="fractal-title">Sierpiński tetrahedron</h2></div>
+      <div class="view-actions"><button id="reset" title="Reset camera">Reset</button><button id="download-image" type="button" disabled>Download</button></div>
+      <div id="error" role="alert" hidden></div>
+      <div id="gradient-legend" class="legend"><span id="legend-top">HIGH</span><i></i><span id="legend-bottom">LOW</span></div>
+      <div class="view-footer"><div class="status"><span class="status-dot"></span><span id="status" role="status">Generating points…</span></div></div>
+    </section>
+    <aside id="appearance-panel" class="panel controls-panel" aria-label="Point generation and rendering">
+      <div class="panel-heading"><h2 class="panel-title">Plot</h2><button id="toggle-appearance" class="sidebar-toggle" type="button" aria-label="Hide Plot" aria-expanded="true" aria-controls="appearance-panel">Hide</button></div>
+        <label for="count">Points <output id="count-label">250,000</output></label>
+        <input id="count" type="range" min="10000" max="1000000" step="10000" value="250000">
+        <div class="range-ends"><span>10k</span><span>1 million</span></div>
+      <details class="sampling"><summary>Sampling settings</summary><label for="seed">Random seed</label><input id="seed" type="number" step="1" value="42"><label for="burn-in">Burn-in iterations</label><input id="burn-in" type="number" min="0" max="10000" step="1" value="100"><label>Initial point</label><div class="initial-point"><input id="initial-x" aria-label="Initial x" type="number" step="any" value="0"><input id="initial-y" aria-label="Initial y" type="number" step="any" value="0"><input id="initial-z" aria-label="Initial z" type="number" step="any" value="0"></div></details>
+      <button id="regenerate" class="primary"><svg class="regenerate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2.3 5.7M20 7l-2.3-2.3"/></svg><span>Regenerate points</span></button>
+      <section>
+        <label for="size">Point size <output id="size-label">1.4</output></label>
+        <input id="size" type="range" min="0.5" max="4" step="0.1" value="1.4">
+        <label for="color-mode">Color mapping</label>
+        <select id="color-mode"><option value="height">Elevation</option><option value="transform">Transform identity</option><option value="depth">Depth</option><option value="mono">Monochrome</option></select>
+      <div id="mono-legend" class="mono-legend" hidden>
+        <label for="mono-color">Color</label><input id="mono-color" type="color" value="#a8dbc0" aria-label="Monochrome color"><output id="mono-hex" for="mono-color">#A8DBC0</output>
+        <div class="mono-swatches" role="group" aria-label="Monochrome palette">
+          <button type="button" data-color="#ffffff" aria-label="White" style="--swatch:#ffffff"></button><button type="button" data-color="#c2ef87" aria-label="Lime" style="--swatch:#c2ef87"></button><button type="button" data-color="#54bfb5" aria-label="Teal" style="--swatch:#54bfb5"></button><button type="button" data-color="#6ba9ff" aria-label="Blue" style="--swatch:#6ba9ff"></button><button type="button" data-color="#ed7751" aria-label="Coral" style="--swatch:#ed7751"></button><button type="button" data-color="#ce8de8" aria-label="Purple" style="--swatch:#ce8de8"></button>
+        </div>
+      </div>
+        <div class="swatches" role="group" aria-label="Color palette"><button class="swatch active" data-palette="aurora" aria-label="Aurora palette" aria-pressed="true"></button><button class="swatch" data-palette="ember" aria-label="Ember palette" aria-pressed="false"></button><button class="swatch" data-palette="ocean" aria-label="Ocean palette" aria-pressed="false"></button><span id="palette-label">Aurora</span></div>
+        <label class="toggle"><span>Auto-rotate</span><input id="rotate" type="checkbox" checked></label>
+        <label class="toggle"><span>Reference grid</span><input id="grid" type="checkbox"></label>
+      </section>
+    </aside>
+  </main>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form method="dialog" class="dialog-heading"><h2 id="editor-title">Edit IFS</h2><button aria-label="Close editor" class="close">×</button></form>
+    <label for="ifs-name">Name</label><input id="ifs-name" class="name-input" maxlength="80" value="Custom IFS">
+    <div class="editor-tools"><div class="segmented"><button id="fields-tab" type="button" class="selected">Table</button><button id="json-tab" type="button">JSON</button></div><button id="add-map" class="text-button" type="button">+ Add map</button></div>
+    <div id="visual-editor"><div class="map-table-scroll"><table class="map-table"><thead><tr><th scope="col">Map</th><th scope="col">Type</th><th scope="col">Definition</th><th scope="col"><div class="weight-column-heading"><span>Weight</span><label class="uniform-weight-toggle"><input id="equal-probabilities" type="checkbox">Uniform</label></div></th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody id="map-rows"></tbody></table></div><div class="table-bottom-actions"><button id="add-map-bottom" class="text-button" type="button">+ Add map</button></div>
+    <div class="probability-summary"><span id="probability-total" role="status"></span></div><p class="weight-help">Each weight must be positive; their sum must be 1.</p></div>
+    <div id="json-editor" hidden><div class="json-file-actions"><button id="import-json" type="button" class="secondary-button">Import JSON</button><button id="export-json" type="button" class="secondary-button">Export JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden></div><textarea aria-label="IFS transformations (JSON)" id="system-json" spellcheck="false"></textarea></div>
+    <p id="editor-error" role="alert"></p><button id="apply" class="primary">Apply IFS</button>
+  </dialog>
+  <dialog id="sponge-dialog" aria-labelledby="sponge-title">
+    <form method="dialog" class="dialog-heading"><div><span id="sponge-family" class="eyebrow"></span><h2 id="sponge-title">Edit sponge</h2></div><button class="close" aria-label="Close sponge editor">×</button></form>
+    <label for="sponge-name">Name</label><input id="sponge-name" class="name-input" maxlength="80">
+    <div class="grid-definition-heading"><h3 class="grid-definition-title">Define grid</h3><button id="sponge-update" class="secondary-button" type="button">Update grid</button></div>
+    <div id="sponge-cubic-controls" hidden><label class="axis-input">Size<input aria-label="Grid size" id="sponge-n" class="name-input" type="number" min="2" max="10" step="1"></label></div>
+    <div id="sponge-grid-controls"><div class="sponge-axis-inputs"><label class="axis-input">x<input aria-label="Grid size x" id="sponge-nx" type="number" min="2" max="10" step="1"></label><label class="axis-input">y<input aria-label="Grid size y" id="sponge-ny" type="number" min="2" max="10" step="1"></label><label class="axis-input">z<input aria-label="Grid size z" id="sponge-nz" type="number" min="2" max="10" step="1"></label></div></div>
+    <div id="sponge-cut-controls" hidden><div class="cut-inputs"><label class="axis-input">x<input aria-label="x interval widths" id="sponge-cuts-x" type="text" spellcheck="false" placeholder="0.2, 0.5, 0.3"></label><label class="axis-input">y<input aria-label="y interval widths" id="sponge-cuts-y" type="text" spellcheck="false" placeholder="0.25, 0.35, 0.4"></label><label class="axis-input">z<input aria-label="z interval widths" id="sponge-cuts-z" type="text" spellcheck="false" placeholder="0.15, 0.55, 0.3"></label></div><p class="sponge-help">Positive widths summing to 1 on each axis. Fractions such as 1/3 are supported.</p></div>
+    <div id="sponge-grid-status" role="status"></div>
+    <div id="sponge-axis-strips" class="axis-strips"></div>
+    <div class="cell-selection-toolbar"><div><h3>Select cells</h3><span id="sponge-selected-count" role="status"></span></div><div class="selection-actions"><button id="sponge-select-all" type="button">Select all</button><button id="sponge-clear" type="button">Clear</button><button id="sponge-invert" type="button">Invert</button></div></div>
+    <div class="slice-orientation">XY layers · x → · y ↑ · z increases by layer</div>
+    <div class="sponge-selection-layout">
+      <div><label class="layer-selector" for="sponge-layer">Layer<select id="sponge-layer"></select></label><div id="sponge-layers" class="sponge-layers"></div></div>
+      <div class="cell-preview-panel"><h4>Cell preview</h4><div id="sponge-preview"></div><div class="preview-legend"><span>Current layer</span><span>Other layers</span></div></div>
+    </div>
+    <div class="sponge-weight-row"><label class="uniform-weight-toggle"><input id="sponge-uniform" type="checkbox" checked>Uniform</label><span id="sponge-weight-total"></span></div>
+    <div id="sponge-weights" class="sponge-custom-weights" hidden></div>
+    <p id="sponge-error" role="alert"></p><button id="sponge-apply" class="primary" type="button">Apply sponge</button>
+  </dialog>
+  <dialog id="export-dialog" aria-labelledby="export-title">
+    <form method="dialog" class="dialog-heading"><h2 id="export-title">Download</h2><button class="close" aria-label="Close download options">×</button></form>
+    <label for="export-format">Format</label><select id="export-format"><option value="png">PNG</option><option value="pdf">PDF</option><option value="jpeg">JPEG</option></select>
+    <label for="export-background">Background</label><select id="export-background"><option value="transparent">None (transparent)</option><option value="dark">Dark</option><option value="white">White</option></select>
+    <p id="export-note" class="export-note" hidden>JPEG does not support transparency.</p>
+    <label class="toggle"><span>Include grid</span><input id="export-grid" type="checkbox"></label>
+    <p id="export-error" role="alert"></p><button id="save-image" type="button" class="primary">Download</button>
+  </dialog>
+  <script type="module" src="/src/app.ts"></script>
+</body></html>

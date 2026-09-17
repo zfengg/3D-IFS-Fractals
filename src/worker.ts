@@ -1,0 +1,2 @@
+import { IFS, type Vector3 } from './model';
+self.onmessage=({data}: MessageEvent<{id:number;maps:unknown;count:number;seed:number;burnIn:number;initialPoint:Vector3}>)=>{try{const system=IFS.fromJSON(data.maps);const result=system.generate(data.count,data.seed,data.burnIn,data.initialPoint);self.postMessage({id:data.id,...result},[result.positions.buffer,result.ids.buffer]);}catch(error){self.postMessage({id:data.id,error:(error as Error).message});}};
