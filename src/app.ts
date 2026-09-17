@@ -22,7 +22,7 @@ let customSponge:SpongeDefinition|undefined;
 let activeSurface:SurfaceDefinition|undefined,customSurface:SurfaceDefinition|undefined;
 let activeDescription='';
 let currentPreset='tetra';
-let maps=system.toJSON(),palette='aurora',seed=42,job=0;
+let maps=system.toJSON(),palette=Object.keys(palettes)[0],seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
 let viewer:FractalViewer|undefined;
 let adaptiveGallery=true;
@@ -40,6 +40,7 @@ for(const [key,stops] of Object.entries(palettes)){
  button.style.background=`linear-gradient(120deg,${stops.join(',')})`;
  swatches.insertBefore(button,$('palette-label'));
 }
+$('palette-label').textContent=palette[0].toUpperCase()+palette.slice(1);
 $('preset').replaceChildren();
 for(const [key,preset] of Object.entries(presets)){const option=document.createElement('option');option.value=key;option.textContent=preset.name;$('preset').append(option);}
 $('preset').value=currentPreset;
