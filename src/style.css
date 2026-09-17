@@ -159,3 +159,5 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
  .legend{right:18px;bottom:82px;gap:8px}
  .legend i{height:85px}
 }
+
+.rotation-detail-note{font-size:11px;color:var(--muted);line-height:1.5;margin:-6px 0 14px}
