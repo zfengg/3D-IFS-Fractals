@@ -19,6 +19,7 @@ let customSystem:IFS|null=null;
 let activeSponge:SpongeDefinition|undefined;
 let customSponge:SpongeDefinition|undefined;
 let activeSurface:SurfaceDefinition|undefined,customSurface:SurfaceDefinition|undefined;
+let activeDescription='';
 let currentPreset='tetra';
 let maps=system.toJSON(),palette='aurora',seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
@@ -30,7 +31,7 @@ $('preset').value=currentPreset;
 function showError(message:string){$('error').textContent=message;$('error').hidden=!message;}
 function mapKindLabel(){return `${maps.every(map=>'a' in map)?'affine ':''}${maps.length===1?'map':'maps'}`;}
 function updateInfo(preset:Preset){
- $('preset-note').textContent=preset.note??'';$('preset-note').hidden=!preset.note;
+ activeDescription=preset.note??'';
  $('fractal-title').textContent=preset.name; $('current-ifs-name').textContent=preset.name;
  const nonlinear=maps.filter(m=>'x' in m).length;
  $('map-kind-label').textContent=mapKindLabel();
@@ -153,7 +154,7 @@ const spongeEditor=new SpongeEditor((next,name,sponge)=>{
 const bernoulliEditor=new BernoulliEditor((next,name)=>{regenerate({maps:next,info:{name,description:'',maps:next},custom:true});});
 const surfaceEditor=new SurfaceEditor((next,name,surface)=>{regenerate({maps:next,info:{name,description:'',maps:next,surface},custom:true});});
 function editCurrent(){
- if(activeSurface){surfaceEditor.open(activeSurface,system.name);return;}
+ if(activeSurface){surfaceEditor.open(activeSurface,system.name,activeDescription);return;}
  if(activeSponge)spongeEditor.open(activeSponge,system.name);
  else if(isBernoulli(maps))bernoulliEditor.open(maps,system.name);
  else editor.open(maps,system.name,false);

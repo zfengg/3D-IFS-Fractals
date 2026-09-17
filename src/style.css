@@ -126,6 +126,6 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
 
 #new-system-controls #create-new{flex:0 0 44px;width:44px;justify-content:center;padding:10px}#create-new .control-icon{width:22px;height:22px;flex-basis:22px}
 
-#preset-note{font-size:12px;line-height:1.55;color:var(--muted);margin:14px 0}
+#surface-description{font-size:12px;line-height:1.55;color:var(--muted);margin:14px 0}
 
 #surface-phi{height:90px}#surface-error{color:#ffb5ad}#surface-dialog label[for="surface-name"]{font-size:16px;font-weight:500;color:inherit}
