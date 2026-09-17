@@ -1,3 +1,4 @@
+import {MotionQuality} from '../src/MotionQuality';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {AffineMap,NonlinearMap,IFS,type Vector3} from '../src/model';
@@ -245,3 +246,13 @@ test('piecewise-linear gallery surface has matching edges and preserves its grap
   assert.ok(Math.abs(out[2]-graph(out[0],out[1]))<1e-9);
  }
 });
+
+ test('rotation defaults respect point budget and reduced motion',()=>{
+ const desktop=new MotionQuality(250_000),mobile=new MotionQuality(100_000);
+ assert.equal(desktop.shouldAutoRotate(250_000),true);
+ assert.equal(desktop.shouldAutoRotate(250_001),false);
+ assert.equal(mobile.shouldAutoRotate(100_000),true);
+ assert.equal(mobile.shouldAutoRotate(250_000),false);
+ assert.equal(desktop.shouldAutoRotate(10_000,true),false);
+ desktop.budget=50_000;assert.equal(desktop.shouldAutoRotate(100_000),false);
+ });

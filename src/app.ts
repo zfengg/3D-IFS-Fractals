@@ -71,6 +71,10 @@ function regenerate(candidate:Candidate|null=null){
  worker.onmessage=({data})=>{
   if(data.id!==job)return;
   if(data.error){fail(data.error);return;}clearTimeout(timeout);worker?.terminate();
+  if(pending||!sample||sample.ids.length!==data.ids.length){
+   viewer!.autoRotate=viewer!.defaultAutoRotate(data.ids.length);
+   $('rotate').checked=viewer!.autoRotate;
+  }
   if(pending){activeSurface=pending.info.surface?structuredClone(pending.info.surface):undefined;system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSurface=activeSurface?structuredClone(activeSurface):undefined;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
   sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();$('status').textContent=`${data.ids.length.toLocaleString()} points · ${maps.length} ${maps.length===1?'map':'maps'}`;
   if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();
@@ -89,12 +93,7 @@ function init(){
  }
 }
 $('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge,surface:customSurface},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
-$('count').addEventListener('input',()=>{$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>{
- // Show the requested density instead of leaving automatic rotation in preview mode.
- if(viewer)viewer.autoRotate=false;
- $('rotate').checked=false;
- regenerate(pending);
-});
+$('count').addEventListener('input',()=>{$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>regenerate(pending));
 $('size').addEventListener('input',()=>{$('size-label').textContent=Number($('size').value).toFixed(1);viewer?.setPointSize(Number($('size').value));});
 $('color-mode').addEventListener('change',recolor);
 $('mono-color').addEventListener('input',recolor);

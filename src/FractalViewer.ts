@@ -77,6 +77,7 @@ export class FractalViewer {
     });
   }
 
+  defaultAutoRotate(count:number):boolean {return this.motionQuality.shouldAutoRotate(count,matchMedia('(prefers-reduced-motion: reduce)').matches);}
   get autoRotate(): boolean { return this.controls.autoRotate; }
   set autoRotate(value: boolean) { this.controls.autoRotate = value; }
   set showGrid(value: boolean) { this.grid.visible = value;this.needsRender=true; }

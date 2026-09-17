@@ -3,6 +3,7 @@ export class MotionQuality {
   private slowFrames=0;
   private lastTime:number|null=null;
   constructor(public budget=250_000, private readonly minimum=50_000) {}
+  shouldAutoRotate(count:number,reducedMotion=false):boolean {return !reducedMotion&&count<=this.budget;}
   update(time:number,moving:boolean):number {
     const elapsed=this.lastTime===null?0:time-this.lastTime;
     this.lastTime=moving?time:null;
