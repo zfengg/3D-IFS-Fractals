@@ -1,3 +1,4 @@
+import {bernoulliMaps,bernoulliMatrix} from './bernoulli';
 import {spongeMaps,mengerExample,baranskiExample,bedfordExample,type SpongeDefinition} from './sponges';
 import { IFS, type MapDefinition } from './model';
 export { IFS };
@@ -28,6 +29,7 @@ for(let i=0;i<3;i++){
 
 export const presets: Record<string,Preset>={
  tetra:{name:'Sierpiński tetrahedron',description:'Four half-scale copies, nested into a tetrahedron. A three-dimensional relative of the Sierpiński triangle.',maps:tetra},
+ bernoulli:{name:'3D Bernoulli convolutions',description:'Two maps with a shared linear matrix and translations (0,0,0) and (1,1,1).',maps:bernoulliMaps(bernoulliMatrix)},
  menger:{name:'Menger sponge',description:'Twenty smaller cubes remain at every level, opening a lattice of tunnels through the original cube.',maps:spongeMaps(mengerExample),sponge:mengerExample},
  baranski:{name:'Barański sponge',description:'A nonuniform 3 × 3 × 3 grid with 20 retained rectangular cells.',maps:spongeMaps(baranskiExample),sponge:baranskiExample},
  bedfordMcMullen:{name:'Bedford–McMullen sponge',description:'A 2 × 3 × 4 grid with 16 retained cells and contraction ratios 1/2, 1/3, 1/4.',maps:spongeMaps(bedfordExample),sponge:bedfordExample},

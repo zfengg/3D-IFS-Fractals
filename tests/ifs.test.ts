@@ -136,3 +136,18 @@ test('motion budget responds to sustained slow frames without reacting to pauses
  for(let i=0;i<300;i++)quality.update(time+=30,true);
  assert.equal(quality.budget,50000);
 });
+
+test('Bernoulli maps share a matrix with fixed translations and complementary probabilities',async()=>{
+ const {bernoulliMaps,bernoulliMatrix,isBernoulli}=await import('../src/bernoulli');
+ const maps=bernoulliMaps(bernoulliMatrix,.3);
+ assert.deepEqual(maps.map(m=>m.b),[[0,0,0],[1,1,1]]);
+ assert.deepEqual(maps.map(m=>m.p),[.3,.7]);
+ assert.deepEqual(maps[0].a,maps[1].a);assert.notEqual(maps[0].a,maps[1].a);
+ assert.ok(isBernoulli(maps));assert.ok(!isBernoulli(presets.tetra.maps));
+ assert.ok(!isBernoulli([maps[0],{...maps[1],b:[1,0,1]}]));
+ assert.throws(()=>bernoulliMaps([1,2]));assert.throws(()=>bernoulliMaps(bernoulliMatrix,0));
+ assert.throws(()=>bernoulliMaps(bernoulliMatrix,1));
+ const p:Vector3=[1,2,3],out:Vector3=[0,0,0];
+ new AffineMap(maps[1].a,maps[1].b,maps[1].p).apply(...p,out);
+ assert.deepEqual(out,[1.72,2.16,2.29]);
+});
