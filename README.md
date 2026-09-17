@@ -44,3 +44,7 @@ npm run dev
 ## Deploy
 
 This repository deploys to **GitHub Pages** automatically on pushes to `main`, after tests and the production build pass. To deploy a fork, select **Settings → Pages → Source → GitHub Actions**. You can also host `dist/` on any static web host.
+
+## License
+
+[MIT](LICENSE) © 2026 zfengg.
