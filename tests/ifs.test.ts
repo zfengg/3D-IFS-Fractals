@@ -45,7 +45,7 @@ test('invalid systems and divergent or undefined trajectories fail usefully',()=
  assert.throws(()=>IFS.fromJSON([{a:[1],b:[0,0,0],p:1}]));
  assert.throws(()=>new IFS([new NonlinearMap(['x+1e9','y','z'])]).generate(100));
  assert.throws(()=>new IFS([new NonlinearMap(['sqrt(-1)','y','z'])]).generate(100));
- assert.throws(()=>createPreset('tetra').generate(5000001));
+ assert.throws(()=>createPreset('tetra').generate(10000001));
 });
 
 test('initial points are validated without mutation; notebook-style metadata is available',()=>{
@@ -160,11 +160,12 @@ test('Bernoulli maps share a matrix with editable translations and complementary
 });
 
 
-test('the five-million-point limit is supported',()=>{
- const sample=createPreset('menger').generate(5_000_000,42);
- assert.equal(sample.positions.length,15_000_000);
- assert.equal(sample.ids.length,5_000_000);
+test('the ten-million-point limit is supported',()=>{
+ const sample=createPreset('menger').generate(10_000_000,42);
+ assert.equal(sample.positions.length,30_000_000);
+ assert.equal(sample.ids.length,10_000_000);
  assert.ok(sample.positions.every(Number.isFinite));
+ assert.throws(()=>createPreset('menger').generate(10_000_001,42),/Point count/);
 });
 
 test('Feng ETDS example reproduces the six digits and inverse expansion of Example 7.1',()=>{

@@ -73,7 +73,7 @@ export class IFS {
   }
   toJSON(): MapDefinition[] {return this.maps.map(m=>m.toJSON());}
   generate(count: number, seed=42, burnIn=100, initialPoint: Vector3=[0,0,0]): PointSample {
-    if(!Number.isInteger(count)||count<1||count>5000000)throw new Error('Point count must be between 1 and 5,000,000.');
+    if(!Number.isInteger(count)||count<1||count>10000000)throw new Error('Point count must be between 1 and 10,000,000.');
     if(!Number.isInteger(burnIn)||burnIn<0||burnIn>10000)throw new Error('Burn-in must be between 0 and 10,000.');
     if(initialPoint.length!==3||!initialPoint.every(Number.isFinite))throw new Error('The initial point must have three finite coordinates.');
     let state=seed>>>0;
