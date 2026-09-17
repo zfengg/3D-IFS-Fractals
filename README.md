@@ -24,7 +24,7 @@ Built with **TypeScript, Three.js, and Vite**—no backend or API keys required.
 
 Map weights are positive probabilities summing to 1. **Uniform** assigns equal weights; grid widths and map weights are independent.
 
-**Feng's ETDS example** reproduces Example 7.1 of [Zhou Feng, *On the coincidence of the Hausdorff and box dimensions for some affine-invariant sets*](https://doi.org/10.1017/etds.2025.10208): six equally weighted maps with linear part `diag(1/64, 1/16, 1/8)` and digit vectors `(0,0,0)`, `(0,1,0)`, `(0,2,0)`, `(0,3,0)`, `(0,0,1)`, `(1,0,1)`. Each translation is the digit vector multiplied by that matrix.
+**BM sponge with MFD = MME** reproduces Example 7.1 of [Zhou Feng, *On the coincidence of the Hausdorff and box dimensions for some affine-invariant sets*](https://doi.org/10.1017/etds.2025.10208): six equally weighted maps with linear part `diag(1/64, 1/16, 1/8)` and digit vectors `(0,0,0)`, `(0,1,0)`, `(0,2,0)`, `(0,3,0)`, `(0,0,1)`, `(1,0,1)`. Each translation is the digit vector multiplied by that matrix.
 
 ## How it works
 
