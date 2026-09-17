@@ -129,3 +129,5 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
 #surface-description{font-size:12px;line-height:1.55;color:var(--muted);margin:14px 0}
 
 #surface-phi{height:90px}#surface-error{color:#ffb5ad}#surface-dialog label[for="surface-name"]{font-size:16px;font-weight:500;color:inherit}
+
+.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.swatches .swatch{width:100%;height:30px}.swatches #palette-label{grid-column:1/-1;justify-self:end;margin:0}

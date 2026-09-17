@@ -24,9 +24,8 @@ export class FractalViewer {
     pointSize: { value: 1.4 },
     mapCount: { value: 4 },
     mode: { value: 0 },
-    low: { value: new THREE.Color('#416db8') },
-    middle: { value: new THREE.Color('#54bfb5') },
-    high: { value: new THREE.Color('#d6ef92') },
+    paletteColors: { value: Array.from({length:5},()=>new THREE.Color('#416db8')) },
+    paletteSize: { value: 3 },
   };
 
   constructor(private readonly container: HTMLElement, onContextLost: () => void) {
@@ -102,9 +101,8 @@ export class FractalViewer {
   }
 
   setColors(stops: string[], mode: ColorMode): void {
-    this.uniforms.low.value.set(stops[0]);
-    this.uniforms.middle.value.set(stops[1]);
-    this.uniforms.high.value.set(stops[2]);
+    this.uniforms.paletteSize.value=stops.length;
+    this.uniforms.paletteColors.value.forEach((color,i)=>color.set(stops[Math.min(i,stops.length-1)]));
     this.uniforms.mode.value = ['height', 'transform', 'depth', 'mono'].indexOf(mode);
     this.needsRender=true;
   }
@@ -128,7 +126,8 @@ export class FractalViewer {
       vertexShader: `
         attribute float mapIndex;
         uniform float pointSize, mode, mapCount;
-        uniform vec3 low, middle, high;
+        uniform vec3 paletteColors[5];
+        uniform float paletteSize;
         varying vec3 vColor;
         void main() {
           float t = position.y / 3.0 + 0.5;
@@ -136,7 +135,12 @@ export class FractalViewer {
           if (mode == 2.0) t = position.z / 3.0 + 0.5;
           if (mode == 3.0) t = 0.65;
           t = clamp(t, 0.0, 1.0);
-          vColor = t < 0.5 ? mix(low, middle, t * 2.0) : mix(middle, high, (t - 0.5) * 2.0);
+          float positionInPalette=t*(paletteSize-1.0);
+          vColor=paletteColors[0];
+          for(int i=0;i<4;i++){
+            if(positionInPalette>=float(i) && float(i)<paletteSize-1.0)
+              vColor=mix(paletteColors[i],paletteColors[i+1],clamp(positionInPalette-float(i),0.0,1.0));
+          }
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           gl_PointSize = pointSize;
         }`,

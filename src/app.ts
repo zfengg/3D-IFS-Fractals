@@ -1,3 +1,4 @@
+import {palettes} from './palettes';
 import {SurfaceEditor} from './SurfaceEditor';
 import {surfaceDefinitions,type SurfaceDefinition} from './surfaces';
 import {BernoulliEditor} from './BernoulliEditor';
@@ -24,7 +25,14 @@ let currentPreset='tetra';
 let maps=system.toJSON(),palette='aurora',seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
 let viewer:FractalViewer|undefined;
-const palettes:Record<string,string[]>={aurora:['#416db8','#54bfb5','#d6ef92'],ember:['#a43889','#ed7751','#ffe7a1'],ocean:['#5145bc','#44a6e6','#b2f8ed']};
+const swatches=document.querySelector<HTMLElement>('.swatches')!;
+for(const [key,stops] of Object.entries(palettes)){
+ const name=key[0].toUpperCase()+key.slice(1),button=document.createElement('button');
+ button.type='button';button.className='swatch'+(key===palette?' active':'');button.dataset.palette=key;
+ button.setAttribute('aria-label',`${name} palette`);button.setAttribute('aria-pressed',String(key===palette));button.title=name;
+ button.style.background=`linear-gradient(120deg,${stops.join(',')})`;
+ swatches.insertBefore(button,$('palette-label'));
+}
 $('preset').replaceChildren();
 for(const [key,preset] of Object.entries(presets)){const option=document.createElement('option');option.value=key;option.textContent=preset.name;$('preset').append(option);}
 $('preset').value=currentPreset;
