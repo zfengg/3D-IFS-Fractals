@@ -2,7 +2,7 @@
 
 An interactive 3D IFS explorer built with **TypeScript, Three.js, and Vite**.
 
-[Open the explorer](https://zfengg.github.io/3d-ifs-fractals/) · [Source code](https://github.com/zfengg/3d-ifs-fractals)
+[Open the explorer](https://zfengg.github.io/3D-IFS-Fractals/) · [Source code](https://github.com/zfengg/3D-IFS-Fractals)
 
 ## Run locally
 
