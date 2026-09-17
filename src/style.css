@@ -139,3 +139,5 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
 .summand-preview-panel{margin:18px 0;border:1px solid #354b43;border-radius:8px;overflow:hidden;background:#0c171b}.summand-preview-panel h3{font-size:14px;font-weight:500;margin:14px 16px 0}#summand-preview{height:240px;touch-action:none}#summand-preview canvas{display:block;width:100%;height:100%}#summand-preview-status{font-size:12px;color:var(--muted);margin:0 16px 14px}
 
 #surface-dialog{width:min(900px,calc(100vw - 28px))}.summand-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}.summand-layout .summand-preview-panel{margin:18px 0 0}@media(max-width:650px){.summand-layout{grid-template-columns:1fr;gap:0}}
+
+.surface-ifs-definition{margin:20px 0;padding:16px;border:1px solid #354b43;border-radius:8px;background:#0c171b}.surface-ifs-definition h3{font-size:14px;font-weight:500;margin:0 0 10px}.surface-ifs-definition p{font-size:12px;color:var(--muted);margin:8px 0}.surface-ifs-definition .surface-map-formula{font:13px/1.7 monospace;color:#d6ef92;overflow-wrap:anywhere}
