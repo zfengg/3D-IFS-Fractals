@@ -34,7 +34,7 @@ All three surface examples use the Weierstrass-type series `h(x,y) + Σ λⁿ φ
 | Takagi-type | `Σ λⁿ [τ(2ⁿx) + τ(2ⁿy)]`, λ = 0.6 |
 | Interpolation terrain | `h(x,y) + 0.8 Σ 0.45ⁿ τ(2ⁿx)τ(2ⁿy)`, with `h = 0.2x + 0.35y − 0.45xy` |
 
-Here `n ≥ 0` and `τ(t) = 2 dist(t, ℤ)` is the periodic tent function. The terrain interpolates the four corner heights of `h` and height 0.9625 at the center. **Edit IFS** opens a shared surface editor with sine-product, tent-product, tent-sum, and custom summands, editable λ, and base h(x,y); arbitrary edits need not preserve a continuous graph. The Takagi maps are affine because the tent function is linear on each half-period.
+Here `n ≥ 0` and `τ(t) = 2 dist(t, ℤ)` is the periodic tent function. The terrain interpolates the four corner heights of `h` and height 0.9625 at the center. **Edit IFS** opens a shared surface editor with sine-product, tent-product, tent-sum, and custom summands, a live 3D summand preview, editable λ, and base h(x,y); arbitrary edits need not preserve a continuous graph. The Takagi maps are affine because the tent function is linear on each half-period.
 
 ## How it works
 
