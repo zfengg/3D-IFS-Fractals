@@ -25,6 +25,7 @@ let currentPreset='tetra';
 let maps=system.toJSON(),palette='aurora',seed=42,job=0;
 let sample:PointSample|null=null,worker:Worker|null=null,pending:Candidate|null=null,timeout:ReturnType<typeof setTimeout>|undefined;
 let viewer:FractalViewer|undefined;
+let adaptiveTetra=true;
 let renderedCount=0,renderedMaps=0,generating=false;
 function updatePointStatus(){
  $('status').textContent=renderedCount
@@ -66,31 +67,38 @@ function recolor(){
  document.querySelector<HTMLElement>('.legend i')!.style.background=`linear-gradient(${[...palettes[palette]].reverse().join(',')})`;
  $('legend-top').textContent=mode==='transform'?'LAST':'HIGH';$('legend-bottom').textContent=mode==='transform'?'FIRST':'LOW';$('gradient-legend').hidden=mono;
 }
-function regenerate(candidate:Candidate|null=null){
+function regenerate(candidate:Candidate|null=null,automatic=false){
  if(!viewer)return;
+ viewer.adaptiveDefault=false;
  const burnIn=$('burn-in').valueAsNumber,initialPoint=['initial-x','initial-y','initial-z'].map(id=>$(id).valueAsNumber);seed=$('seed').valueAsNumber;
  if(!Number.isInteger(seed)||!Number.isInteger(burnIn)||burnIn<0||burnIn>10000||!initialPoint.every(Number.isFinite)){const message='Enter a whole-number seed, a burn-in from 0 to 10,000, and three finite initial coordinates.';showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;return;}
  worker?.terminate();clearTimeout(timeout);const id=++job;pending=candidate;
  generating=true;updatePointStatus();showError('');worker=new Worker(new URL('./worker.ts',import.meta.url),{type:'module'});
- const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;generating=false;if(sample)updatePointStatus();else $('status').textContent='Generation failed';};
+ const fail=(message:string)=>{if(id!==job)return;clearTimeout(timeout);worker?.terminate();pending=null;$('preset').value=currentPreset;showError(message);if($('editor').open)$('editor-error').textContent=message;if($('sponge-dialog').open)$('sponge-error').textContent=message;if($('bernoulli-dialog').open)$('bernoulli-error').textContent=message;if($('surface-dialog').open)$('surface-error').textContent=message;generating=false;adaptiveTetra=false;if(sample)updatePointStatus();else $('status').textContent='Generation failed';};
  worker.onerror=e=>fail(messageOf(e)||'Unable to start the point generator.');
  worker.onmessage=({data})=>{
   if(data.id!==job)return;
   if(data.error){fail(data.error);return;}clearTimeout(timeout);worker?.terminate();
-  if(pending||!sample||sample.ids.length!==data.ids.length){
+  if(!automatic&&(pending||!sample||sample.ids.length!==data.ids.length)){
    viewer!.autoRotate=viewer!.defaultAutoRotate(data.ids.length);
    $('rotate').checked=viewer!.autoRotate;
   }
   if(pending){activeSurface=pending.info.surface?structuredClone(pending.info.surface):undefined;system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSurface=activeSurface?structuredClone(activeSurface):undefined;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
-  generating=false;sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();
-  if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();
+  generating=false;viewer!.adaptiveDefault=adaptiveTetra&&currentPreset==='tetra';sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();
+  if(!automatic){if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();}
  };
  timeout=setTimeout(()=>fail('Generation took too long. Try fewer points or simpler expressions.'),15000);
  worker.postMessage({id,maps:candidate?.maps||maps,count:Number($('count').value),seed,burnIn,initialPoint});
 }
 function init(){
  try {
-  viewer=new FractalViewer($('canvas-container'),()=>showError('The graphics context was lost. Reload this page to restore the view.'),(count,mapCount)=>{renderedCount=count;renderedMaps=mapCount;updatePointStatus();});
+  viewer=new FractalViewer($('canvas-container'),()=>showError('The graphics context was lost. Reload this page to restore the view.'),(count,mapCount)=>{renderedCount=count;renderedMaps=mapCount;updatePointStatus();},(budget,slowed)=>{
+   if(!adaptiveTetra||currentPreset!=='tetra'||generating||pending||document.querySelector('dialog[open]'))return;
+   const count=Math.max(50_000,Math.floor(budget/10_000)*10_000);
+   if(slowed)adaptiveTetra=false;
+   $('count').value=String(count);$('count-label').textContent=count.toLocaleString();
+   regenerate(null,true);
+  });
   $('rotate').checked=viewer.autoRotate;
   updateInfo(presets.tetra);regenerate();
  } catch(error) {
@@ -98,8 +106,8 @@ function init(){
   $('status').textContent='3D rendering unavailable';
  }
 }
-$('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge,surface:customSurface},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
-$('count').addEventListener('input',()=>{$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>regenerate(pending));
+$('preset').addEventListener('change',()=>{const key=$('preset').value;adaptiveTetra=key==='tetra';if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge,surface:customSurface},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
+$('count').addEventListener('input',()=>{adaptiveTetra=false;if(viewer)viewer.adaptiveDefault=false;$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>regenerate(pending));
 $('size').addEventListener('input',()=>{$('size-label').textContent=Number($('size').value).toFixed(1);viewer?.setPointSize(Number($('size').value));});
 $('color-mode').addEventListener('change',recolor);
 $('mono-color').addEventListener('input',recolor);
