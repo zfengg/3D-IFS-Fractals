@@ -9,7 +9,7 @@ Built with **TypeScript, Three.js, and Vite**—no backend or API keys required.
 
 ## Explore and create
 
-- **Load an example:** Sierpiński tetrahedron, Menger, Barański, Bedford–McMullen, Vicsek, and more.
+- **Load an example:** Sierpiński tetrahedron, Menger, Barański, Bedford–McMullen, Vicsek, Cantor dust, a twisted tetrahedron, and a branching tree.
 - **Edit an IFS:** combine affine matrices and nonlinear expressions; import or export JSON.
 - **Design a sponge:** define its grid, select cells layer by layer, and inspect a live 3D preview.
 - **Adjust the plot:** point count, size, colors, rotation, and an optional reference grid.
