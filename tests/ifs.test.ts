@@ -44,7 +44,7 @@ test('invalid systems and divergent or undefined trajectories fail usefully',()=
  assert.throws(()=>IFS.fromJSON([{a:[1],b:[0,0,0],p:1}]));
  assert.throws(()=>new IFS([new NonlinearMap(['x+1e9','y','z'])]).generate(100));
  assert.throws(()=>new IFS([new NonlinearMap(['sqrt(-1)','y','z'])]).generate(100));
- assert.throws(()=>createPreset('tetra').generate(1000001));
+ assert.throws(()=>createPreset('tetra').generate(5000001));
 });
 
 test('initial points are validated without mutation; notebook-style metadata is available',()=>{
@@ -156,4 +156,12 @@ test('Bernoulli maps share a matrix with editable translations and complementary
  const p:Vector3=[1,2,3],out:Vector3=[0,0,0];
  new AffineMap(maps[1].a,maps[1].b,maps[1].p).apply(...p,out);
  assert.deepEqual(out,[1.72,2.16,2.29]);
+});
+
+
+test('the five-million-point limit is supported',()=>{
+ const sample=createPreset('menger').generate(5_000_000,42);
+ assert.equal(sample.positions.length,15_000_000);
+ assert.equal(sample.ids.length,5_000_000);
+ assert.ok(sample.positions.every(Number.isFinite));
 });
