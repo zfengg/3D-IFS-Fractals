@@ -86,15 +86,20 @@ for(const [buttonId,showId,panelId,cssClass] of [
  ['toggle-ifs','show-ifs','ifs-panel','ifs-hidden'],
  ['toggle-appearance','show-appearance','appearance-panel','appearance-hidden'],
 ]){
- const setHidden=(hidden:boolean)=>{
+ const preferenceKey=`ifs-explorer.sidebar.${panelId}`;
+ const setHidden=(hidden:boolean,userAction=false)=>{
   $(panelId).hidden=hidden;
   document.querySelector('main')!.classList.toggle(cssClass,hidden);
   $(showId).hidden=!hidden;
   $(buttonId).setAttribute('aria-expanded',String(!hidden));
-  $(hidden?showId:buttonId).focus();
+  if(userAction){
+   $(hidden?showId:buttonId).focus();
+   try{localStorage.setItem(preferenceKey,hidden?'hidden':'visible');}catch{/* Storage may be disabled; controls still work. */}
+  }
  };
- $(buttonId).addEventListener('click',()=>setHidden(true));
- $(showId).addEventListener('click',()=>setHidden(false));
+ try{setHidden(localStorage.getItem(preferenceKey)==='hidden');}catch{setHidden(false);}
+ $(buttonId).addEventListener('click',()=>setHidden(true,true));
+ $(showId).addEventListener('click',()=>setHidden(false,true));
 }
 $('download-image').addEventListener('click',()=>{
  if(!viewer||!sample)return;
