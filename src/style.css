@@ -122,3 +122,4 @@ select,.map-table select{
 .bernoulli-translation{display:grid;grid-template-columns:24px repeat(3,minmax(0,1fr));align-items:end;gap:8px;margin-bottom:10px}.bernoulli-translation>span{padding-bottom:10px}.bernoulli-translation label{margin:0;font-size:12px}.bernoulli-translation input{margin-top:4px}
 .system-panel>.current-system-section{border-top:0}
 dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font-weight:500;color:inherit}
+#new-system-controls{display:flex;align-items:stretch;gap:8px}#new-system-controls select{flex:1;min-width:0;width:0}#new-system-controls .editor-entry{flex:0 0 auto;width:auto;margin:0;white-space:nowrap;padding:8px;font-size:12px;gap:6px}
