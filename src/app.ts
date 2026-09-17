@@ -72,7 +72,7 @@ function regenerate(candidate:Candidate|null=null){
   if(data.id!==job)return;
   if(data.error){fail(data.error);return;}clearTimeout(timeout);worker?.terminate();
   if(pending){activeSurface=pending.info.surface?structuredClone(pending.info.surface):undefined;system=IFS.fromJSON(pending.maps,pending.info.name);maps=system.toJSON();activeSponge=pending.info.sponge?structuredClone(pending.info.sponge):undefined;updateInfo(pending.info);if(pending.custom){customSystem=system;customSurface=activeSurface?structuredClone(activeSurface):undefined;customSponge=activeSponge?structuredClone(activeSponge):undefined;currentPreset='custom';if(!$('preset').querySelector('[value="custom"]')){const option=document.createElement('option');option.value='custom';option.textContent='Custom system';$('preset').append(option);}$('preset').value='custom';}else {$('preset').value=pending.key!;currentPreset=pending.key!;}pending=null;}
-  sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();$('status').textContent=`${data.ids.length.toLocaleString()} points · ${maps.length} ${mapKindLabel()}`;
+  sample=data;viewer!.setSample(data,maps.length);$('download-image').disabled=false;recolor();$('status').textContent=`${data.ids.length.toLocaleString()} points · ${maps.length} ${maps.length===1?'map':'maps'}`;
   if($('editor').open)$('editor').close();if($('sponge-dialog').open)$('sponge-dialog').close();if($('bernoulli-dialog').open)$('bernoulli-dialog').close();if($('surface-dialog').open)$('surface-dialog').close();
  };
  timeout=setTimeout(()=>fail('Generation took too long. Try fewer points or simpler expressions.'),15000);
