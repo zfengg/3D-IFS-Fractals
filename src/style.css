@@ -98,7 +98,7 @@ select,.map-table select{
 
 .json-file-actions{display:flex;gap:10px;margin-bottom:12px}
 .controls-panel #regenerate{display:flex;align-items:center;justify-content:center;gap:9px}
-.regenerate-icon{width:20px;height:20px;flex:0 0 20px}
+.regenerate-icon{width:18px;height:18px;flex:0 0 18px}
 .grid-definition-title{font-size:16px;font-weight:500;margin:24px 0 14px}
 #sponge-dialog .axis-input{display:flex;align-items:center;gap:10px;margin:0;min-width:0}
 #sponge-dialog .axis-input input{margin:0;flex:1;min-width:0;width:0}
