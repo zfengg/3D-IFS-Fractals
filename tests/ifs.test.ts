@@ -248,11 +248,27 @@ test('piecewise-linear gallery surface has matching edges and preserves its grap
 });
 
  test('rotation defaults respect point budget and reduced motion',()=>{
- const desktop=new MotionQuality(250_000),mobile=new MotionQuality(100_000);
+ const desktop=new MotionQuality(250_000),mobile=new MotionQuality(250_000);
  assert.equal(desktop.shouldAutoRotate(250_000),true);
  assert.equal(desktop.shouldAutoRotate(250_001),false);
  assert.equal(mobile.shouldAutoRotate(100_000),true);
- assert.equal(mobile.shouldAutoRotate(250_000),false);
+ assert.equal(mobile.shouldAutoRotate(250_000),true);
  assert.equal(desktop.shouldAutoRotate(10_000,true),false);
  desktop.budget=50_000;assert.equal(desktop.shouldAutoRotate(100_000),false);
+ });
+
+ test('smooth motion increases detail up to the available points, with recovery after slowdown',()=>{
+  const quality=new MotionQuality();let time=0;quality.update(time,true,1_000_000);
+  for(let i=0;i<60;i++)quality.update(time+=16.7,true,1_000_000);
+  assert.equal(quality.budget,312_500);
+  for(let i=0;i<600;i++)quality.update(time+=16.7,true,1_000_000);
+  assert.equal(quality.budget,1_000_000);
+  for(let i=0;i<20;i++)quality.update(time+=120,true,1_000_000);
+  assert.equal(quality.budget,700_000);
+  for(let i=0;i<120;i++)quality.update(time+=16.7,true,1_000_000);
+  assert.equal(quality.budget,700_000);
+  for(let i=0;i<60;i++)quality.update(time+=16.7,true,1_000_000);
+  assert.equal(quality.budget,875_000);
+  for(let i=0;i<1200;i++)quality.update(time+=16.7,true,8_000_000);
+  assert.equal(quality.budget,5_000_000);
  });

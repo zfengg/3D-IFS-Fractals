@@ -14,7 +14,7 @@ export class FractalViewer {
   private readonly controls: OrbitControls;
   private readonly grid = new THREE.GridHelper(12, 30, 0x365047, 0x233630);
   private readonly resizeObserver: ResizeObserver;
-  private readonly motionQuality = new MotionQuality(matchMedia('(pointer: coarse)').matches ? 100_000 : 250_000);
+  private readonly motionQuality = new MotionQuality(250_000);
   private interacting = false;
   private lastMovement = -Infinity;
   private needsRender = true;
@@ -64,7 +64,7 @@ export class FractalViewer {
       if (document.hidden) { this.motionQuality.update(time,false); return; }
       const changed=this.controls.update(delta);
       const moving=this.interacting||changed||time-this.lastMovement<180;
-      const budget=this.motionQuality.update(time,moving);
+      const budget=this.motionQuality.update(time,moving,this.pointCount);
       if(this.cloud){
         const count=moving?Math.min(this.pointCount,budget):this.pointCount;
         if(this.cloud.geometry.drawRange.count!==count){this.cloud.geometry.setDrawRange(0,count);this.needsRender=true;}

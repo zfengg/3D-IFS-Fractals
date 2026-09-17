@@ -49,7 +49,7 @@ Parenthesize each conditional when combining functions. Comparisons and nested c
 
 **IFS maps + probabilities → chaos-game sampling → interactive WebGL point cloud**
 
-The [chaos game](https://en.wikipedia.org/wiki/Chaos_game) repeatedly applies a randomly selected map and plots the resulting points. An `IFS` object owns the maps, validation, and seeded sampling. A Web Worker generates points while Three.js renders them. During camera movement, adaptive detail keeps interaction responsive; full detail returns when movement settles and is used for exports.
+The [chaos game](https://en.wikipedia.org/wiki/Chaos_game) repeatedly applies a randomly selected map and plots the resulting points. An `IFS` object owns the maps, validation, and seeded sampling. A Web Worker generates points while Three.js renders them. During camera movement, the viewer starts with a 250,000-point budget and increases detail toward the selected count (up to five million) while frames remain smooth, reducing detail when rendering slows; full detail returns when movement settles and is used for exports.
 
 ## Run locally
 
