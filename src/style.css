@@ -134,4 +134,4 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
 
 .sampling-controls{position:relative;margin-top:22px}.sampling-controls .sampling{margin:0;padding:0;border:0}.sampling-controls summary{min-height:34px;line-height:34px;padding-right:106px}.controls-panel #regenerate{position:absolute;top:0;right:0;margin:0;padding:8px 14px;width:auto}
 
-.sampling-controls summary,.controls-panel #regenerate{font-size:13px}.sampling-controls summary{padding-right:116px;line-height:36px;min-height:36px}.controls-panel #regenerate{gap:6px;padding:8px 10px}.controls-panel .regenerate-icon{width:16px;height:16px;flex-basis:16px}
+.sampling-controls summary,.controls-panel #regenerate{font-size:12px}.sampling-controls summary{padding-right:124px;line-height:36px;min-height:36px}.controls-panel #regenerate{gap:4px;padding:9px 4px}.controls-panel .regenerate-icon{width:14px;height:14px;flex-basis:14px}
