@@ -143,3 +143,19 @@ dialog label[for="ifs-name"],dialog label[for="sponge-name"]{font-size:16px;font
 .surface-ifs-definition{margin:20px 0;padding:16px;border:1px solid #354b43;border-radius:8px;background:#0c171b}.surface-ifs-definition h3{font-size:14px;font-weight:500;margin:0 0 10px}.surface-ifs-definition p{font-size:12px;color:var(--muted);margin:8px 0}.surface-ifs-definition .surface-map-formula{font:13px/1.7 monospace;color:#d6ef92;overflow-wrap:anywhere}
 
 .piecewise-help{margin:16px 0;color:var(--muted);font-size:12px}.piecewise-help summary{cursor:pointer;color:#c2ef87}.piecewise-help pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c171b;padding:12px;border-radius:6px}.piecewise-help code{color:#d6ef92}
+
+/* Keep status and actions in one footer, separate from the color legend. */
+.view-footer{flex-direction:row;align-items:center;gap:12px}
+.view-footer .status{min-width:0;flex:1}
+.view-footer .status-dot{flex-shrink:0}
+.view-footer #status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.view-footer .view-actions{position:static;flex:0 0 auto;flex-wrap:nowrap}
+.legend{top:auto;bottom:90px}
+@media(max-width:580px){
+ .view-footer{left:12px;right:12px;bottom:14px;gap:8px}
+ .view-footer .status{gap:6px;font-size:11px}
+ .view-footer .view-actions{gap:6px}
+ .view-footer .view-actions button{min-height:44px;padding:8px;font-size:11px}
+ .legend{right:18px;bottom:82px;gap:8px}
+ .legend i{height:85px}
+}
