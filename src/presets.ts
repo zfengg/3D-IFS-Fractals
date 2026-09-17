@@ -2,7 +2,7 @@ import {bernoulliMaps,bernoulliMatrix} from './bernoulli';
 import {spongeMaps,mengerExample,baranskiExample,bedfordExample,type SpongeDefinition} from './sponges';
 import { IFS, type MapDefinition } from './model';
 export { IFS };
-export interface Preset {name:string; description:string; maps:MapDefinition[]; sponge?:SpongeDefinition}
+export interface Preset {name:string; description:string; maps:MapDefinition[]; defaultPoints?:number; sponge?:SpongeDefinition}
 export const diagonal = (s: number, b: number[], p = 1) => ({ a: [s,0,0,0,s,0,0,0,s], b, p });
 const tetra = [[0,1.224744871,0],[-1,-0.40824829,-0.577350269],[1,-0.40824829,-0.577350269],[0,-0.40824829,1.154700538]].map(v=>diagonal(.5,v.map(x=>x*.5),1/4));
 const vicsek=[[0,0,0],[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].map(v=>diagonal(1/3,v.map(x=>x*2/3),1/7));
@@ -30,7 +30,7 @@ for(let i=0;i<3;i++){
 export const presets: Record<string,Preset>={
  tetra:{name:'Sierpiński tetrahedron',description:'Four half-scale copies, nested into a tetrahedron. A three-dimensional relative of the Sierpiński triangle.',maps:tetra},
  bernoulli:{name:'3D Bernoulli convolutions',description:'Two maps with a shared linear matrix and translations (0,0,0) and (1,1,1).',maps:bernoulliMaps(bernoulliMatrix)},
- menger:{name:'Menger sponge',description:'Twenty smaller cubes remain at every level, opening a lattice of tunnels through the original cube.',maps:spongeMaps(mengerExample),sponge:mengerExample},
+ menger:{name:'Menger sponge',defaultPoints:750_000,description:'Twenty smaller cubes remain at every level, opening a lattice of tunnels through the original cube.',maps:spongeMaps(mengerExample),sponge:mengerExample},
  baranski:{name:'Barański sponge',description:'A nonuniform 3 × 3 × 3 grid with 20 retained rectangular cells.',maps:spongeMaps(baranskiExample),sponge:baranskiExample},
  bedfordMcMullen:{name:'Bedford–McMullen sponge',description:'A 2 × 3 × 4 grid with 16 retained cells and contraction ratios 1/2, 1/3, 1/4.',maps:spongeMaps(bedfordExample),sponge:bedfordExample},
  octahedron:{name:'Sierpiński octahedron',description:'Six half-scale copies arranged at the vertices of an octahedron.',maps:octahedron},

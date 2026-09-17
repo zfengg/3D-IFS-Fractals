@@ -75,7 +75,7 @@ function init(){
   $('status').textContent='3D rendering unavailable';
  }
 }
-$('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge},custom:true});return;}if(presets[key])regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});});
+$('preset').addEventListener('change',()=>{const key=$('preset').value;if(key==='custom'&&customSystem){const saved=customSystem.toJSON();regenerate({maps:saved,info:{name:customSystem.name,description:'Your custom affine and nonlinear transformations.',maps:saved,sponge:customSponge},custom:true});return;}if(presets[key]){const count=presets[key].defaultPoints??250_000;$('count').value=String(count);$('count-label').textContent=count.toLocaleString();regenerate({maps:structuredClone(presets[key].maps),info:presets[key],key});}});
 $('count').addEventListener('input',()=>{$('count-label').textContent=Number($('count').value).toLocaleString();});$('count').addEventListener('change',()=>regenerate(pending));
 $('size').addEventListener('input',()=>{$('size-label').textContent=Number($('size').value).toFixed(1);viewer?.setPointSize(Number($('size').value));});
 $('color-mode').addEventListener('change',recolor);
