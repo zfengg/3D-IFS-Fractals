@@ -31,7 +31,7 @@ All four surface examples use the Weierstrass-type series `h(x,y) + Σ λⁿ φ(
 | Surface | Definition and parameters |
 | --- | --- |
 | Weierstrass | `Σ λⁿ sin(2π·2ⁿx) sin(2π·2ⁿy)`, λ = 0.65 |
-| Piecewise-linear | Asymmetric tents in x and y, with peaks at 0.35 and 0.6; λ = 0.6 |
+| Piecewise-linear | Nested linear ridges in x and y, plus a local pyramid and basin; λ = 0.6 |
 | Takagi-type | `Σ λⁿ [τ(2ⁿx) + τ(2ⁿy)]`, λ = 0.6 |
 | Interpolation terrain | `h(x,y) + 0.8 Σ 0.45ⁿ τ(2ⁿx)τ(2ⁿy)`, with `h = 0.2x + 0.35y − 0.45xy` |
 

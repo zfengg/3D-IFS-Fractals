@@ -25,7 +25,7 @@ export interface SurfaceDefinition {phi:string;lambda:number;base:string}
 export const surfaceDefinitions:Record<'weierstrass'|'terrain'|'takagi'|'piecewise',SurfaceDefinition>={
  weierstrass:{phi:'sin(2*pi*x)*sin(2*pi*y)',lambda:.65,base:'0'},
  terrain:{phi:'0.8*(1-abs(2*x-1))*(1-abs(2*y-1))',lambda:.45,base:'0.2*x+0.35*y-0.45*x*y'},
- piecewise:{phi:'(x < 0.35 ? x/0.35 : (1-x)/0.65) + (y < 0.6 ? y/0.6 : (1-y)/0.4)',lambda:.6,base:'0'},
+ piecewise:{phi:'(x<0.2 ? 4*x : x<0.5 ? 1.6-4*x : x<0.8 ? (10*x-6.2)/3 : 3-3*x) + (y<0.25 ? 2*y : y<0.7 ? (8.5-16*y)/9 : y-1) + max(0,1-4*abs(x-0.65)-5*abs(y-0.55)) - max(0,0.6-4*abs(x-0.25)-4*abs(y-0.7))',lambda:.6,base:'0'},
  takagi:{phi:'(1-abs(2*x-1))+(1-abs(2*y-1))',lambda:.6,base:'0'},
 };
 

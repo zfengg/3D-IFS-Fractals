@@ -231,7 +231,9 @@ test('piecewise expressions use comparison precedence, lazy branches and nested 
 test('piecewise-linear gallery surface has matching edges and preserves its graph',()=>{
  const preset=presets.piecewise,definition=preset.surface!;
  const phi=compileExpression(definition.phi);
- assert.equal(phi(.35,.6,0),2);
+ for(const [x,y,expected] of [[.2,0,.8],[.5,0,-.4],[.8,0,.6],[.65,.55,16/15],[.25,.7,-.3]])assert.ok(Math.abs(phi(x,y,0)-expected)<1e-12);
+ for(const x of [.2,.5,.8])assert.ok(Math.abs(phi(x-1e-8,.4,0)-phi(x+1e-8,.4,0))<1e-6);
+ for(const y of [.25,.7])assert.ok(Math.abs(phi(.4,y-1e-8,0)-phi(.4,y+1e-8,0))<1e-6);
  for(const t of [0,.2,.35,.6,1]){
   assert.ok(Math.abs(phi(0,t,0)-phi(1,t,0))<1e-12);
   assert.ok(Math.abs(phi(t,0,0)-phi(t,1,0))<1e-12);

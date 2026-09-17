@@ -19,7 +19,7 @@ export class SurfaceEditor{
    ? 'Sine product: a smooth wave with positive and negative lobes. Repeated copies add oscillations at successively finer scales.'
    : kind==='terrain' ? 'Tent product: a central peak that vanishes on every edge of the unit square. Repeated copies create a ridged terrain.'
    : kind==='takagi' ? 'Tent sum: the sum of two one-dimensional tent functions. Each quadrant is planar, producing a surface with creases at finer scales.'
-   : kind==='piecewise' ? 'Piecewise-linear tents: unequal slopes put the peaks at x = 0.35 and y = 0.6. The ? branch is used when the condition is true; the : branch otherwise.'
+   : kind==='piecewise' ? 'Piecewise-linear landscape: nested conditionals join four slopes in x and three in y. A local pyramid and basin, built with max and abs, add features depending on both coordinates. The pieces meet continuously.'
    : 'Custom summand: the entered function sets the vertical detail added at each scale.';
  }
  private updatePreview(){
@@ -33,7 +33,7 @@ export class SurfaceEditor{
   <p id="surface-description"></p>
   <label for="surface-name">Name</label><input id="surface-name" class="name-input" maxlength="80">
   <p>f(x,y) = h(x,y) + Σ λⁿ φ(2ⁿx, 2ⁿy), n ≥ 0</p>
-  <div class="summand-layout"><div><label for="surface-function">Summand template</label><select id="surface-function"><option value="custom">Custom</option><option value="weierstrass">Sine product</option><option value="terrain">Tent product</option><option value="takagi">Tent sum</option><option value="piecewise">Piecewise-linear tents</option></select>
+  <div class="summand-layout"><div><label for="surface-function">Summand template</label><select id="surface-function"><option value="custom">Custom</option><option value="weierstrass">Sine product</option><option value="terrain">Tent product</option><option value="takagi">Tent sum</option><option value="piecewise">Piecewise-linear landscape</option></select>
   <label for="surface-phi">Summand φ(x,y)</label><textarea id="surface-phi" spellcheck="false"></textarea>
   </div><div class="summand-preview-panel"><h3>Summand preview</h3><div id="summand-preview"></div><p id="summand-preview-status" role="status"></p></div></div>
   <label for="surface-lambda">Vertical factor λ</label><input id="surface-lambda" class="name-input" type="number" min="0" max="1" step=".01">
