@@ -273,3 +273,29 @@ test('piecewise-linear gallery surface has matching edges and preserves its grap
   for(let i=0;i<1200;i++)quality.update(time+=16.7,true,8_000_000);
   assert.equal(quality.budget,5_000_000);
  });
+
+test('editor JSON round-trips all panel types and retains mathematical definitions',async()=>{
+ const {parseEditorFile,fileMaps}=await import('../src/editorJSON');
+ for(const [key,preset] of Object.entries(presets)){
+  const file=preset.sponge?{version:1,type:'sponge',name:preset.name,definition:preset.sponge}
+   :preset.surface?{version:1,type:'surface',name:preset.name,definition:preset.surface}
+   :{version:1,type:key==='bernoulli'?'bernoulli':'general',name:preset.name,maps:preset.maps};
+  const decoded=parseEditorFile(JSON.parse(JSON.stringify(file)));
+  assert.deepEqual(decoded,JSON.parse(JSON.stringify(file)));
+  assert.ok(IFS.fromJSON(fileMaps(decoded)).generate(100,42).positions.every(Number.isFinite));
+ }
+ const legacy=createPreset('tetra').toJSON();
+ assert.deepEqual(fileMaps(parseEditorFile(legacy)),legacy);
+ const bernoulli=createPreset('bernoulli').toJSON();
+ assert.equal(parseEditorFile({version:1,type:'bernoulli',name:'Pair',maps:bernoulli}).type,'bernoulli');
+});
+
+test('editor JSON rejects unsupported formats and invalid definitions before import',async()=>{
+ const {parseEditorFile}=await import('../src/editorJSON');
+ for(const value of [null,{}, {version:2}, {version:1,type:'unknown',name:'Test'},
+  {version:1,type:'sponge',name:'Test',definition:{kind:'unknown',widths:[[.5,.5],[.5,.5],[.5,.5]],cells:[[0,0,0]]}},
+  {version:1,type:'surface',name:'Test',definition:{phi:'x',base:'0',lambda:1}},
+  {version:1,type:'surface',name:'Test',definition:{phi:'alert(1)',base:'0',lambda:.5}},
+  {version:1,type:'bernoulli',name:'Test',maps:createPreset('tetra').toJSON()},
+ ])assert.throws(()=>parseEditorFile(value));
+});

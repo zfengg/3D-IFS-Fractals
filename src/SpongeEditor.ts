@@ -1,8 +1,10 @@
+import {jsonControls} from './editorJSON';
 import { cellKey, parseWidths, spongeMaps, uniformPartition, validatePartitions, type Cell, type SpongeDefinition, type SpongeKind } from './sponges';
 import { CellPreview } from './CellPreview';
 import type { AffineDefinition } from './model';
 
 export class SpongeEditor {
+  private invalidateImport = () => {};
   private kind: SpongeKind = 'bedfordMcMullen';
   private widths: SpongeDefinition['widths'] = [uniformPartition(3), uniformPartition(4), uniformPartition(5)];
   private cells = new Map<string, number>();
@@ -12,6 +14,14 @@ export class SpongeEditor {
   private readonly dialog = this.el<HTMLDialogElement>('sponge-dialog');
 
   constructor(private readonly onApply: (maps: AffineDefinition[], name: string, definition: SpongeDefinition) => void) {
+    this.invalidateImport=jsonControls(this.dialog,()=>{
+      if(this.dirty)throw Error('Update the grid before exporting.');
+      const cells=this.selectedCells();
+      return {version:1,type:'sponge',name:this.el<HTMLInputElement>('sponge-name').value.trim()||'Custom sponge',definition:{kind:this.kind,widths:structuredClone(this.widths),cells,weights:cells.map(c=>this.cells.get(cellKey(c))!)}};
+    },file=>{
+      if(file.type!=='sponge')throw Error('Import a sponge JSON file in this panel. Use the general IFS editor for map arrays.');
+      this.open(file.definition,file.name);
+    },message=>this.setError(message));
     this.el<HTMLSelectElement>('sponge-layer').onchange = () => {
       this.activeLayer = Number(this.el<HTMLSelectElement>('sponge-layer').value);
       this.renderLayers(); this.updatePreview();
@@ -59,6 +69,7 @@ export class SpongeEditor {
   }
 
   open(definition: SpongeDefinition, name: string, creating = false): void {
+    this.invalidateImport();
     this.kind = definition.kind;
     this.activeLayer = 0;
     this.widths = structuredClone(definition.widths);

@@ -70,3 +70,5 @@ This repository deploys to **GitHub Pages** automatically on pushes to `main`, a
 ## License
 
 [MIT](LICENSE) © 2026 zfengg.
+
+Every IFS editor includes **Import JSON** and **Export JSON**. Files preserve the name and editor parameters: general maps, sponge grids/cells/weights, Bernoulli maps, or Weierstrass summand/base/vertical factor. Import fills the draft; **Apply IFS** updates the plot. The general editor also accepts legacy map arrays and opens any exported file as maps.

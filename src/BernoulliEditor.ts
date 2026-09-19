@@ -1,11 +1,13 @@
+import {jsonControls,fileMaps} from './editorJSON';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { bernoulliMaps, bernoulliMatrix } from './bernoulli';
+import { bernoulliMaps, bernoulliMatrix, isBernoulli } from './bernoulli';
 import type { AffineDefinition } from './model';
 
 /** The three draggable endpoints are the columns of the shared linear matrix. */
 export class BernoulliEditor {
+ private invalidateImport = () => {};
  private readonly dialog = document.createElement('dialog');
  private readonly inputs: HTMLInputElement[] = [];
  private readonly translationInputs: HTMLInputElement[][] = [];
@@ -46,6 +48,13 @@ export class BernoulliEditor {
    this.el('bernoulli-error').textContent='Generating points…';
    this.onApply(bernoulliMaps(this.matrix,this.el<HTMLInputElement>('bernoulli-p').valueAsNumber,this.readTranslations()),this.name);
   };
+  this.invalidateImport=jsonControls(this.dialog,()=>{
+   if(!this.validate())throw Error(this.el('bernoulli-error').textContent!);
+   return {version:1,type:'bernoulli',name:this.name,maps:bernoulliMaps(this.matrix,this.el<HTMLInputElement>('bernoulli-p').valueAsNumber,this.readTranslations())};
+  },file=>{
+   const maps=fileMaps(file);if(!isBernoulli(maps))throw Error('Import two affine maps with the same linear matrix.');
+   this.open(maps,file.name);
+  },message=>{this.el('bernoulli-error').textContent=message;});
   this.dialog.addEventListener('close',()=>this.preview?.stop());
  }
  private el<T extends HTMLElement=HTMLElement>(id:string):T{return this.dialog.querySelector(`#${id}`) as T;}
@@ -60,6 +69,7 @@ export class BernoulliEditor {
   }catch(error){this.el('bernoulli-error').textContent=(error as Error).message;this.el<HTMLButtonElement>('bernoulli-apply').disabled=true;return false;}
  }
  open(maps:AffineDefinition[],name:string){
+  this.invalidateImport();
   this.matrix=[...maps[0].a];this.name=name;this.writeInputs();
   this.translationInputs.forEach((row,i)=>row.forEach((input,j)=>input.value=String(maps[i].b[j])));
   this.el<HTMLInputElement>('bernoulli-p').value=String(maps[0].p);this.validate();this.dialog.showModal();

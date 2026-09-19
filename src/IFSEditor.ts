@@ -1,3 +1,4 @@
+import {jsonControls,fileMaps} from './editorJSON';
 import { IFS, type MapDefinition, type AffineDefinition } from './model';
 import { diagonal } from './presets';
 
@@ -5,38 +6,19 @@ import { diagonal } from './presets';
 export class IFSEditor {
   private draft: MapDefinition[] = [];
   private expanded: number | null = null;
-  private session = 0;
+  private invalidateImport = () => {};
   private mode: 'table' | 'json' = 'table';
   private equalWeights = true;
   private readonly dialog = this.element<HTMLDialogElement>('editor');
 
   constructor(private readonly onApply: (maps: MapDefinition[], name: string) => void) {
-    const fileInput=this.element<HTMLInputElement>('json-file');
-    this.element('import-json').onclick=()=>{fileInput.value='';fileInput.click();};
-    fileInput.onchange=async()=>{
-      const file=fileInput.files?.[0];if(!file)return;
-      const session=this.session;
-      try{
-        if(file.size>5*1024*1024)throw new Error('Choose a JSON file smaller than 5 MB.');
-        const text=await file.text();
-        if(session!==this.session||!this.dialog.open)return;
-        const maps=IFS.fromJSON(JSON.parse(text)).toJSON();
-        this.draft=maps;this.expanded=null;
-        this.equalWeights=maps.every(map=>Math.abs(map.p-1/maps.length)<1e-12);
-        this.element<HTMLTextAreaElement>('system-json').value=JSON.stringify(maps,null,2);
-        this.mode='json';this.updateMode();this.error('');
-      }catch(error){if(session===this.session&&this.dialog.open)this.error(`Could not import JSON: ${(error as Error).message}`);}
-    };
-    this.element('export-json').onclick=()=>{
-      try{
-        const maps=IFS.fromJSON(JSON.parse(this.element<HTMLTextAreaElement>('system-json').value)).toJSON();
-        const blob=new Blob([JSON.stringify(maps,null,2)+'\n'],{type:'application/json'});
-        const url=URL.createObjectURL(blob),link=document.createElement('a');
-        const name=this.element<HTMLInputElement>('ifs-name').value.trim().replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-|-$/g,'')||'ifs';
-        link.href=url;link.download=`${name}.json`;document.body.append(link);link.click();link.remove();
-        setTimeout(()=>URL.revokeObjectURL(url),60000);this.error('');
-      }catch(error){this.error(`Could not export JSON: ${(error as Error).message}`);}
-    };
+    this.invalidateImport=jsonControls(this.dialog,()=>({version:1,type:'general',name:this.element<HTMLInputElement>('ifs-name').value.trim()||'Untitled IFS',maps:this.mode==='json'?JSON.parse(this.element<HTMLTextAreaElement>('system-json').value):this.draft}),file=>{
+      const maps=fileMaps(file);this.draft=maps;this.expanded=null;
+      this.equalWeights=maps.every(map=>Math.abs(map.p-1/maps.length)<1e-12);
+      this.element<HTMLInputElement>('ifs-name').value=file.name;
+      this.element<HTMLTextAreaElement>('system-json').value=JSON.stringify(maps,null,2);
+      this.updateMode();
+    },message=>this.error(message));
     this.element('fields-tab').onclick = () => this.setMode('table');
     this.element('json-tab').onclick = () => this.setMode('json');
     this.element('add-map').onclick = () => this.addMap();
@@ -66,7 +48,7 @@ export class IFSEditor {
   }
 
   open(maps: MapDefinition[], name: string, creating: boolean): void {
-    this.session++;
+    this.invalidateImport();
     this.draft = structuredClone(maps);
     this.equalWeights = this.draft.every(map => Math.abs(map.p - 1 / this.draft.length) < 1e-12);
     this.expanded = null; this.mode = 'table';

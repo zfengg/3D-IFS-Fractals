@@ -60,7 +60,7 @@
     <div class="editor-tools"><div class="segmented"><button id="fields-tab" type="button" class="selected">Table</button><button id="json-tab" type="button">JSON</button></div><button id="add-map" class="text-button" type="button">+ Add map</button></div>
     <div id="visual-editor"><div class="map-table-scroll"><table class="map-table"><thead><tr><th scope="col">Map</th><th scope="col">Type</th><th scope="col">Definition</th><th scope="col"><div class="weight-column-heading"><span>Weight</span><label class="uniform-weight-toggle"><input id="equal-probabilities" type="checkbox">Uniform</label></div></th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody id="map-rows"></tbody></table></div><div class="table-bottom-actions"><button id="add-map-bottom" class="text-button" type="button">+ Add map</button></div>
     <div class="probability-summary"><span id="probability-total" role="status"></span></div><p class="weight-help">Each weight must be positive; their sum must be 1.</p></div>
-    <div id="json-editor" hidden><div class="json-file-actions"><button id="import-json" type="button" class="secondary-button">Import JSON</button><button id="export-json" type="button" class="secondary-button">Export JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden></div><textarea aria-label="IFS transformations (JSON)" id="system-json" spellcheck="false"></textarea></div>
+    <div id="json-editor" hidden><textarea aria-label="IFS transformations (JSON)" id="system-json" spellcheck="false"></textarea></div>
     <p id="editor-error" role="alert"></p><button id="apply" class="primary">Apply IFS</button>
   </dialog>
   <dialog id="sponge-dialog" aria-labelledby="sponge-title">
